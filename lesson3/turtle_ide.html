@@ -2,92 +2,84 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Mars Python IDE - Missions</title>
+    <title>Mars Python IDE - 10 Missions</title>
     <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
-    
     <style>
         :root { --neon-cyan: #66fcf1; --mars-red: #ff4d00; --bg: #0b0c10; --panel: #1f2833; }
-        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 15px; display: flex; flex-direction: column; height: 97vh; overflow: hidden; }
-        
-        /* Заголовок и выбор миссий */
-        .mission-header { display: flex; justify-content: space-between; align-items: center; background: var(--panel); padding: 10px 20px; border-radius: 10px; border: 1px solid var(--mars-red); margin-bottom: 10px; }
-        .mission-selector select { background: #000; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 5px; font-family: inherit; }
-
-        /* Окно миссии */
-        #mission-desc { background: rgba(102, 252, 241, 0.1); border-left: 4px solid var(--neon-cyan); padding: 10px; margin-bottom: 10px; font-size: 14px; }
-
-        #main-container { display: flex; gap: 15px; flex-grow: 1; min-height: 0; }
-        #editor-side { flex: 1.2; display: flex; flex-direction: column; }
-        #canvas-side { flex: 1; background: #1a0f0a; border: 2px solid #bf360c; border-radius: 10px; position: relative; }
-
-        textarea { background: #0b0c10; color: #fff; border: 1px solid #45a29e; padding: 15px; font-size: 15px; font-family: inherit; flex-grow: 1; resize: none; outline: none; }
-        
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 10px; display: flex; flex-direction: column; height: 98vh; overflow: hidden; }
+        .mission-header { display: flex; justify-content: space-between; align-items: center; background: var(--panel); padding: 10px 15px; border-radius: 8px; border: 1px solid var(--mars-red); margin-bottom: 8px; }
+        .mission-selector select { background: #000; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 5px; font-family: inherit; cursor: pointer; }
+        #mission-desc { background: rgba(102, 252, 241, 0.1); border-left: 4px solid var(--neon-cyan); padding: 12px; margin-bottom: 8px; font-size: 14px; min-height: 40px; }
+        #main-container { display: flex; gap: 10px; flex-grow: 1; min-height: 0; }
+        #editor-side { flex: 1.1; display: flex; flex-direction: column; }
+        #canvas-side { flex: 1; background: #1a0f0a; border: 2px solid #bf360c; border-radius: 8px; position: relative; }
+        textarea { background: #0b0c10; color: #fff; border: 1px solid #45a29e; padding: 15px; font-size: 14px; font-family: inherit; flex-grow: 1; resize: none; outline: none; }
         .controls { display: flex; gap: 10px; padding: 10px 0; align-items: center; }
-        .run-btn { background: var(--mars-red); color: white; border: none; padding: 10px 25px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; flex-grow: 1; }
+        .run-btn { background: var(--mars-red); color: white; border: none; padding: 10px 20px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; flex-grow: 1; text-transform: uppercase; }
         .run-btn:hover { background: #ff7043; box-shadow: 0 0 15px var(--mars-red); }
-        
-        #status-light { width: 20px; height: 20px; border-radius: 50%; background: #333; margin-left: 10px; }
-        .status-ok { background: #2ecc71 !important; box-shadow: 0 0 10px #2ecc71; }
+        #status-light { width: 24px; height: 24px; border-radius: 50%; background: #333; }
+        .status-ok { background: #2ecc71 !important; box-shadow: 0 0 15px #2ecc71; }
         .status-err { background: var(--mars-red) !important; }
-
         #mycanvas { width: 100%; height: 100%; }
-        #output { color: #888; font-size: 12px; margin-top: 5px; height: 30px; }
+        #output { color: #888; font-size: 11px; height: 30px; overflow: hidden; }
     </style>
 </head>
 <body>
 
 <div class="mission-header">
-    <div style="font-weight: bold;">🛰️ ЦУП: МАРСОХОД-1</div>
+    <div style="font-weight: bold; color: var(--neon-cyan);">🛰️ ЦУП: ТЕРМИНАЛ НАВИГАЦИИ</div>
     <div class="mission-selector">
-        Миссия: 
+        УРОВЕНЬ: 
         <select id="missionSelect" onchange="changeMission()">
-            <option value="1">1. Первый шаг (Проверка тяги)</option>
-            <option value="2">2. Маневр «Угол» (Поворот)</option>
-            <option value="3">3. Разведка периметра (Квадрат)</option>
+            <option value="1">1. Прямой курс</option>
+            <option value="2">2. Лево руля</option>
+            <option value="3">3. Обратный ход</option>
+            <option value="4">4. Прямой угол</option>
+            <option value="5">5. Зигзаг</option>
+            <option value="6">6. Разведка (Квадрат)</option>
+            <option value="7">7. Ангар (Прямоугольник)</option>
+            <option value="8">8. Купол (Треугольник)</option>
+            <option value="9">9. Склад (Шестиугольник)</option>
+            <option value="10">10. Возврат на базу</option>
         </select>
     </div>
 </div>
 
-<div id="mission-desc">
-    <b>ЦЕЛЬ:</b> <span id="goal-text">Проедь вперед на 100 метров, используя метод forward(100).</span>
-</div>
+<div id="mission-desc"><b>ЗАДАЧА:</b> <span id="goal-text">Проедь вперед на 100 метров (forward).</span></div>
 
 <div id="main-container">
     <div id="editor-side">
         <textarea id="yourcode" spellcheck="false">import turtle
 rover = turtle.Turtle()
 rover.color("cyan")
+rover.pensize(3)
 
 # Твой код здесь:
 </textarea>
         <div id="output"></div>
     </div>
-    <div id="canvas-side">
-        <div id="mycanvas"></div>
-    </div>
+    <div id="canvas-side"><div id="mycanvas"></div></div>
 </div>
 
 <div class="controls">
-    <button class="run-btn" onclick="runit()">ЗАПУСТИТЬ ПРОГРАММУ ▶️</button>
-    <div id="status-light" title="Статус выполнения"></div>
-    <div id="check-msg" style="font-size: 14px; font-weight: bold;"></div>
+    <button class="run-btn" onclick="runit()">ИСПОЛНИТЬ КОД ▶️</button>
+    <div id="status-light"></div>
+    <div id="check-msg" style="font-size: 14px; min-width: 150px; text-align: center;"></div>
 </div>
 
 <script>
     const missions = {
-        "1": { 
-            text: "Проедь вперед на 100 метров, используя метод rover.forward(100)", 
-            check: (t) => Math.abs(t.getx() - 100) < 5 && Math.abs(t.gety() - 0) < 5 
-        },
-        "2": { 
-            text: "Проедь 100 метров вперед и поверни направо (right) на 90 градусов.", 
-            check: (t) => Math.abs(t.getx() - 100) < 5 && Math.abs(t.getheading() - 270) < 5 
-        },
-        "3": { 
-            text: "Нарисуй квадрат со стороной 100. Вернись в начало!", 
-            check: (t) => Math.abs(t.getx() - 0) < 5 && Math.abs(t.gety() - 0) < 5 && t.isdown() 
-        }
+        "1": { text: "Проедь вперед на 100 шагов (метод forward).", check: (t) => Math.abs(t.getx() - 100) < 5 },
+        "2": { text: "Поверни ровер налево (left) на 90 градусов.", check: (t) => Math.abs(t.getheading() - 90) < 5 },
+        "3": { text: "Проедь назад на 50 шагов (backward).", check: (t) => Math.abs(t.getx() + 50) < 5 },
+        "4": { text: "Проедь 100 шагов и поверни направо (right) на 90 градусов.", check: (t) => Math.abs(t.getx() - 100) < 5 && Math.abs(t.getheading() - 270) < 5 },
+        "5": { text: "Сделай зигзаг: вперед 50, лево 90, вперед 50.", check: (t) => Math.abs(t.getx() - 50) < 5 && Math.abs(t.gety() - 50) < 5 },
+        "6": { text: "Нарисуй квадрат со стороной 100.", check: (t) => t.getx() < 5 && t.gety() < 5 && Math.abs(t.getheading() % 360) < 5 },
+        "7": { text: "Нарисуй прямоугольник: вперед 150, право 90, вперед 50, право 90...", check: (t) => t.getx() < 5 && t.gety() < 5 },
+        "8": { text: "Нарисуй треугольник (три стороны по 100, повороты 120).", check: (t) => t.getx() < 5 && t.gety() < 5 },
+        "9": { text: "Нарисуй шестиугольник (повороты 60 градусов).", check: (t) => t.getx() < 5 && t.gety() < 5 },
+        "10": { text: "Миссия: База. Проедь 100 вперед, 100 влево, 100 назад, 100 вправо.", check: (t) => Math.abs(t.getx()) < 5 && Math.abs(t.gety()) < 5 }
     };
 
     function changeMission() {
@@ -97,12 +89,11 @@ rover.color("cyan")
         document.getElementById("check-msg").innerText = '';
     }
 
-    function outf(text) { document.getElementById("output").innerHTML += text; } 
+    function outf(text) { document.getElementById("output").innerHTML = text; } 
     function builtinRead(x) { return Sk.builtinFiles["files"][x]; }
 
     function runit() { 
         let prog = document.getElementById("yourcode").value; 
-        document.getElementById("output").innerHTML = ''; 
         Sk.pre = "output";
         Sk.configure({output:outf, read:builtinRead}); 
         (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
@@ -110,21 +101,18 @@ rover.color("cyan")
         Sk.misceval.asyncToPromise(() => {
             return Sk.importMainWithBody("<stdin>", false, prog, true);
         }).then(mod => {
-            // Магия проверки
             let m = document.getElementById("missionSelect").value;
-            let myTurtle = Sk.globals["rover"]; 
-            if (myTurtle && missions[m].check(myTurtle.tp)) {
+            let roverObj = Sk.globals["rover"]; 
+            if (roverObj && missions[m].check(roverObj.tp)) {
                 document.getElementById("status-light").className = 'status-ok';
-                document.getElementById("check-msg").innerText = "✅ МИССИЯ ВЫПОЛНЕНА!";
+                document.getElementById("check-msg").innerText = "ПОДТВЕРЖДЕНО!";
                 document.getElementById("check-msg").style.color = "#2ecc71";
             } else {
                 document.getElementById("status-light").className = 'status-err';
-                document.getElementById("check-msg").innerText = "❌ ЦЕЛЬ НЕ ДОСТИГНУТА";
+                document.getElementById("check-msg").innerText = "ОШИБКА КУРСА";
                 document.getElementById("check-msg").style.color = "#ff4d00";
             }
-        }, err => {
-            outf("<span style='color:red'>" + err.toString() + "</span>");
-        });
+        }, err => { outf("<span style='color:red'>" + err.toString() + "</span>"); });
     }
 </script>
 </body>
