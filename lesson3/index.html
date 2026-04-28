@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Mars Rover - Navigation Simulator</title>
+    <style>
+        :root { --neon-cyan: #66fcf1; --mars-red: #ff4d00; --space-bg: #0b0c10; }
+        body { background: var(--space-bg); color: var(--neon-cyan); font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        
+        #ui-wrapper { width: 90%; max-width: 700px; background: #1f2833; border: 2px solid #45a29e; border-radius: 15px; padding: 20px; box-shadow: 0 0 30px rgba(102, 252, 241, 0.1); }
+        
+        .header { text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
+        
+        canvas { background-color: #3e2723; border: 2px solid #5d4037; border-radius: 8px; cursor: crosshair; display: block; margin: 0 auto; box-shadow: inset 0 0 50px rgba(0,0,0,0.5); }
+        
+        .controls { display: flex; justify-content: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+        
+        .btn { background: #45a29e; border: none; color: #0b0c10; padding: 10px 15px; font-family: inherit; font-weight: bold; border-radius: 5px; cursor: pointer; text-transform: uppercase; font-size: 12px; transition: 0.2s; }
+        .btn:hover { background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); }
+        .btn-reset { background: #ff4d00; color: #fff; }
+
+        #code-log { background: #000; color: #fff; padding: 15px; border-radius: 5px; margin-top: 15px; height: 100px; overflow-y: auto; font-size: 13px; border: 1px solid #333; }
+        .method { color: #f1fa8c; } /* Желтый для методов */
+        .obj { color: #8be9fd; }    /* Голубой для объектов */
+        .arg { color: #ff79c6; }    /* Розовый для аргументов */
+        .comment { color: #6272a4; font-style: italic; }
+    </style>
+</head>
+<body>
+
+<div id="ui-wrapper">
+    <div class="header">
+        <h3 style="margin:0">🕹️ ПАНЕЛЬ УПРАВЛЕНИЯ "ЧЕРЕПАШКА-1"</h3>
+        <small style="color: #888">Тестирование методов движения объекта rover</small>
+    </div>
+
+    <canvas id="marsCanvas" width="600" height="300"></canvas>
+
+    <div class="controls">
+        <button class="btn" onclick="moveForward()">rover.forward(50)</button>
+        <button class="btn" onclick="turnRight()">rover.right(90)</button>
+        <button class="btn" onclick="turnLeft()">rover.left(90)</button>
+        <button class="btn btn-reset" onclick="resetMission()">Сброс (Reset)</button>
+    </div>
+
+    <div id="code-log">
+        <span class="comment"># Бортовой журнал команд:</span><br>
+        <span class="obj">import</span> turtle<br>
+        <span class="obj">rover</span> = turtle.<span class="method">Turtle</span>()<br>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('marsCanvas');
+    const ctx = canvas.getContext('2d');
+    const log = document.getElementById('code-log');
+
+    let x = 300, y = 150, angle = 0; // Начальная позиция и угол (в градусах)
+    let path = [{x, y}];
+
+    function drawRover() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Рисуем кратеры
+        ctx.fillStyle = "rgba(0,0,0,0.1)";
+        ctx.beginPath(); ctx.arc(100, 80, 20, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(450, 200, 40, 0, Math.PI*2); ctx.fill();
+
+        // Рисуем пройденный путь
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(path[0].x, path[0].y);
+        for(let p of path) ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Рисуем саму черепашку/ровер
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle * Math.PI / 180);
+        
+        // Корпус
+        ctx.fillStyle = "#66fcf1";
+        ctx.beginPath();
+        ctx.moveTo(15, 0); ctx.lineTo(-10, -10); ctx.lineTo(-10, 10);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Направление (глаза)
+        ctx.fillStyle = "#000";
+        ctx.fillRect(8, -3, 2, 2);
+        ctx.fillRect(8, 1, 2, 2);
+        
+        ctx.restore();
+    }
+
+    function addCode(method, arg) {
+        const line = document.createElement('div');
+        line.innerHTML = `<span class="obj">rover</span>.<span class="method">${method}</span>(<span class="arg">${arg}</span>)`;
+        log.appendChild(line);
+        log.scrollTop = log.scrollHeight;
+    }
+
+    function moveForward() {
+        const dist = 50;
+        x += dist * Math.cos(angle * Math.PI / 180);
+        y += dist * Math.sin(angle * Math.PI / 180);
+        path.push({x, y});
+        drawRover();
+        addCode('forward', 50);
+    }
+
+    function turnRight() {
+        angle += 90;
+        drawRover();
+        addCode('right', 90);
+    }
+
+    function turnLeft() {
+        angle -= 90;
+        drawRover();
+        addCode('left', 90);
+    }
+
+    function resetMission() {
+        x = 300; y = 150; angle = 0;
+        path = [{x, y}];
+        log.innerHTML = `<span class="comment"># Система перезагружена...</span><br><span class="obj">import</span> turtle<br><span class="obj">rover</span> = turtle.<span class="method">Turtle</span>()<br>`;
+        drawRover();
+    }
+
+    drawRover();
+</script>
+</body>
+</html>
