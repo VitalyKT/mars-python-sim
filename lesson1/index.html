@@ -2,28 +2,106 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Mars Rover Simulator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mars Navigator Terminal</title>
     <style>
-        body { background: #0b0c10; color: #66fcf1; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-        #terminal { width: 90%; max-width: 600px; height: 400px; background: #1f2833; border: 2px solid #45a29e; border-radius: 10px; padding: 20px; box-shadow: 0 0 20px rgba(69, 162, 158, 0.3); display: flex; flex-direction: column; }
-        #output { flex-grow: 1; overflow-y: auto; margin-bottom: 10px; font-size: 14px; line-height: 1.4; }
-        #input-line { display: flex; gap: 10px; align-items: center; }
-        input { background: transparent; border: none; color: #fff; font-family: inherit; font-size: 16px; flex-grow: 1; outline: none; }
-        .error { color: #ff5555; }
-        .success { color: #50fa7b; }
-        .system { color: #888; font-size: 12px; }
+        :root {
+            --neon-cyan: #66fcf1;
+            --mars-red: #ff4d00;
+            --space-bg: #0b0c10;
+        }
+
+        body {
+            background-color: var(--space-bg);
+            color: var(--neon-cyan);
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #terminal-container {
+            width: 90%;
+            max-width: 700px;
+            background: #1f2833;
+            border: 2px solid #45a29e;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(102, 252, 241, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Эффект помех */
+        #terminal-container::before {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #output {
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .line { margin: 0; font-size: 14px; }
+        .system { color: #888; font-style: italic; }
+        .error { color: var(--mars-red); font-weight: bold; }
+        .success { color: #2ecc71; text-shadow: 0 0 5px #2ecc71; }
+        .user-input { color: #fff; }
+
+        #input-area {
+            display: flex;
+            border-top: 1px solid #45a29e;
+            padding-top: 15px;
+        }
+
+        #prompt { color: var(--neon-cyan); margin-right: 10px; font-weight: bold; }
+
+        #commandInput {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: inherit;
+            font-size: 16px;
+            outline: none;
+            flex-grow: 1;
+        }
+
+        /* Скроллбар */
+        #output::-webkit-scrollbar { width: 5px; }
+        #output::-webkit-scrollbar-thumb { background: #45a29e; border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<div id="terminal">
-    <div id="output">
-        <div class="system">[СИСТЕМА]: Связь установлена. Канал: MARS-GATE-1</div>
-        <div class="system">[ИНСТРУКЦИЯ]: Используй функцию print("сообщение"), чтобы проверить связь.</div>
+<div id="terminal-container">
+    <div style="text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 10px;">
+        <h3 style="margin: 0; letter-spacing: 2px;">📡 КОНСОЛЬ СВЯЗИ: ЗЕМЛЯ-МАРС</h3>
+        <small style="color: #45a29e;">Статус: Ожидание команды...</small>
     </div>
-    <div id="input-line">
-        <span>&gt;&gt;&gt;</span>
-        <input type="text" id="commandInput" autofocus placeholder="Введите код Python...">
+
+    <div id="output">
+        <div class="line system">[СИСТЕМА]: Связь установлена через спутник MRO.</div>
+        <div class="line system">[СИСТЕМА]: Марсоход "Черепашка-1" готов к приему телеметрии.</div>
+        <div class="line">Попробуй отправить сообщение марсоходу (например: Привет).</div>
+    </div>
+
+    <div id="input-area">
+        <span id="prompt">>>></span>
+        <input type="text" id="commandInput" autofocus autocomplete="off" spellcheck="false">
     </div>
 </div>
 
@@ -31,40 +109,56 @@
     const input = document.getElementById('commandInput');
     const output = document.getElementById('output');
 
+    const responses = {
+        empty: "[ОШИБКА]: Эфир пуст. Введите команду.",
+        human: "❌ [ОШИБКА СИНТАКСИСА]: Ровер не понимает человеческую речь. Сигнал рассеян.",
+        noQuotes: "❌ [АТМОСФЕРНАЯ ОШИБКА]: Текст без кавычек \" \" сгорел в слоях атмосферы. Кавычки — это скафандр для слов!",
+        noParentheses: "⚠️ [ОШИБКА ПЕРЕДАТЧИКА]: Вы забыли нажать кнопку передачи (скобки). Используйте print( ... )",
+        success: "✅ [СВЯЗЬ УСТАНОВЛЕНА]: Сообщение успешно выведено на монитор ровера!"
+    };
+
     input.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
-            const val = input.value.trim();
-            addLine(`>>> ${val}`, 'white');
-            
-            // Простая имитация интерпретатора Python
-            if (val.startsWith('print(') && val.endsWith(')')) {
-                const match = val.match(/print\((['"])(.*?)\1\)/);
-                if (match) {
-                    setTimeout(() => {
-                        addLine(`[МАРС]: ${match[2]}`, 'success');
-                        addLine(`[СИСТЕМА]: Сигнал доставлен успешно. Тест пройден!`, 'system');
-                    }, 600);
-                } else {
-                    addLine("Ошибка синтаксиса: проверь кавычки внутри скобок!", "error");
-                }
-            } else if (val === "") {
-                // Ничего не делаем
-            } else {
-                addLine(`NameError: name '${val.split('(')[0]}' is not defined.`, "error");
-                addLine("Подсказка: Для вывода текста используй print()", "system");
-            }
-            
+            const cmd = input.value.trim();
+            if (!cmd) return;
+
+            printToTerminal(`>>> ${cmd}`, 'user-input');
+            processCommand(cmd);
             input.value = '';
             output.scrollTop = output.scrollHeight;
         }
     });
 
-    function addLine(text, className) {
+    function printToTerminal(text, className) {
         const div = document.createElement('div');
-        div.className = className;
+        div.className = 'line ' + className;
         div.textContent = text;
         output.appendChild(div);
     }
+
+    function processCommand(cmd) {
+        // Логика проверки
+        setTimeout(() => {
+            if (!cmd.includes('print')) {
+                printToTerminal(responses.human, 'error');
+                printToTerminal("Подсказка: Используй специальную функцию-передатчик: print()", "system");
+            } 
+            else if (!cmd.includes('(') || !cmd.includes(')')) {
+                printToTerminal(responses.noParentheses, 'error');
+            }
+            else if (!cmd.includes('"') && !cmd.includes("'")) {
+                printToTerminal(responses.noQuotes, 'error');
+                printToTerminal("Попробуй: print(\"Твое сообщение\")", "system");
+            }
+            else {
+                // Если всё правильно
+                const content = cmd.match(/\(([^)]+)\)/)[1].replace(/['"]/g, '');
+                printToTerminal(`[МАРС]: Принято сообщение -> "${content}"`, 'success');
+                printToTerminal(responses.success, 'system');
+            }
+        }, 500);
+    }
 </script>
+
 </body>
 </html>
