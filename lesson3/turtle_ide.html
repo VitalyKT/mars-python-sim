@@ -69,12 +69,12 @@ rover.pensize(3)
 </div>
 
 <script>
-    // Описания миссий и функции проверки
+    // 1. Уточненные миссии с проверкой координат
     const missions = {
-        "1": { text: "Проедь вперед на 100 шагов (метод forward).", check: (t) => Math.abs(t.x - 100) < 5 },
+        "1": { text: "Проедь вперед на 100 метров (forward).", check: (t) => Math.abs(t.x - 100) < 5 },
         "2": { text: "Поверни ровер налево (left) на 90 градусов.", check: (t) => Math.abs(t.heading - 90) < 5 },
-        "3": { text: "Проедь назад на 50 шагов (backward).", check: (t) => Math.abs(t.x + 50) < 5 },
-        "4": { text: "Проедь 100 шагов и поверни направо (right) на 90 градусов.", check: (t) => Math.abs(t.x - 100) < 5 && Math.abs(t.heading - 270) < 5 },
+        "3": { text: "Проедь назад на 50 метров (backward).", check: (t) => Math.abs(t.x + 50) < 5 },
+        "4": { text: "Проедь 100 и поверни направо (right) на 90 градусов.", check: (t) => Math.abs(t.x - 100) < 5 && (Math.abs(t.heading - 270) < 5 || Math.abs(t.heading + 90) < 5) },
         "5": { text: "Сделай зигзаг: вперед 50, лево 90, вперед 50.", check: (t) => Math.abs(t.x - 50) < 5 && Math.abs(t.y - 50) < 5 },
         "6": { text: "Нарисуй квадрат со стороной 100.", check: (t) => Math.abs(t.x) < 5 && Math.abs(t.y) < 5 },
         "7": { text: "Нарисуй прямоугольник: вперед 150, право 90, вперед 50, право 90...", check: (t) => Math.abs(t.x) < 5 && Math.abs(t.y) < 5 },
@@ -88,9 +88,7 @@ rover.pensize(3)
         document.getElementById("goal-text").innerText = missions[m].text;
         document.getElementById("status-light").className = '';
         document.getElementById("check-msg").innerText = '';
-        // Очищаем канвас при смене миссии
-        const canvasDiv = document.getElementById("mycanvas");
-        canvasDiv.innerHTML = '';
+        document.getElementById("mycanvas").innerHTML = '';
     }
 
     function outf(text) { document.getElementById("output").innerHTML = text; } 
@@ -98,8 +96,9 @@ rover.pensize(3)
 
     function runit() { 
         let prog = document.getElementById("yourcode").value; 
-        // Добавляем автоматическую мгновенную скорость, чтобы проверка не срабатывала раньше времени
-        if (prog.includes('rover = turtle.Turtle()')) {
+        
+        // ПРИНУДИТЕЛЬНО ставим мгновенную скорость, если её нет
+        if (!prog.includes('speed')) {
             prog = prog.replace('rover = turtle.Turtle()', 'rover = turtle.Turtle(); rover.speed(0);');
         }
 
@@ -114,12 +113,12 @@ rover.pensize(3)
         Sk.misceval.asyncToPromise(() => {
             return Sk.importMainWithBody("<stdin>", false, prog, true);
         }).then(mod => {
-            // Даем небольшую паузу 100мс на всякий случай
+            // Ждем подольше, чтобы координаты успели обновиться в памяти
             setTimeout(() => {
                 let m = document.getElementById("missionSelect").value;
                 let roverObj = Sk.globals["rover"]; 
                 
-                // В Skulpt данные черепашки лежат в roverObj.tp
+                // Проверяем наличие объекта и данных координат (tp - это internal turtle properties в Skulpt)
                 if (roverObj && roverObj.tp && missions[m].check(roverObj.tp)) {
                     document.getElementById("status-light").className = 'status-ok';
                     document.getElementById("check-msg").innerText = "ПОДТВЕРЖДЕНО!";
@@ -128,8 +127,10 @@ rover.pensize(3)
                     document.getElementById("status-light").className = 'status-err';
                     document.getElementById("check-msg").innerText = "ОШИБКА КУРСА";
                     document.getElementById("check-msg").style.color = "#ff4d00";
+                    // Для отладки (выводит координаты в консоль браузера)
+                    if (roverObj && roverObj.tp) console.log("Текущие X:", roverObj.tp.x, "Y:", roverObj.tp.y);
                 }
-            }, 100);
+            }, 500); 
         }, err => { 
             outf("<span style='color:red'>" + err.toString() + "</span>"); 
             document.getElementById("status-light").className = 'status-err';
