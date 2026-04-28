@@ -69,17 +69,18 @@ rover.pensize(3)
 </div>
 
 <script>
+    // Описания миссий и функции проверки
     const missions = {
-        "1": { text: "Проедь вперед на 100 шагов (метод forward).", check: (t) => Math.abs(t.getx() - 100) < 5 },
-        "2": { text: "Поверни ровер налево (left) на 90 градусов.", check: (t) => Math.abs(t.getheading() - 90) < 5 },
-        "3": { text: "Проедь назад на 50 шагов (backward).", check: (t) => Math.abs(t.getx() + 50) < 5 },
-        "4": { text: "Проедь 100 шагов и поверни направо (right) на 90 градусов.", check: (t) => Math.abs(t.getx() - 100) < 5 && Math.abs(t.getheading() - 270) < 5 },
-        "5": { text: "Сделай зигзаг: вперед 50, лево 90, вперед 50.", check: (t) => Math.abs(t.getx() - 50) < 5 && Math.abs(t.gety() - 50) < 5 },
-        "6": { text: "Нарисуй квадрат со стороной 100.", check: (t) => t.getx() < 5 && t.gety() < 5 && Math.abs(t.getheading() % 360) < 5 },
-        "7": { text: "Нарисуй прямоугольник: вперед 150, право 90, вперед 50, право 90...", check: (t) => t.getx() < 5 && t.gety() < 5 },
-        "8": { text: "Нарисуй треугольник (три стороны по 100, повороты 120).", check: (t) => t.getx() < 5 && t.gety() < 5 },
-        "9": { text: "Нарисуй шестиугольник (повороты 60 градусов).", check: (t) => t.getx() < 5 && t.gety() < 5 },
-        "10": { text: "Миссия: База. Проедь 100 вперед, 100 влево, 100 назад, 100 вправо.", check: (t) => Math.abs(t.getx()) < 5 && Math.abs(t.gety()) < 5 }
+        "1": { text: "Проедь вперед на 100 шагов (метод forward).", check: (t) => Math.abs(t.x - 100) < 5 },
+        "2": { text: "Поверни ровер налево (left) на 90 градусов.", check: (t) => Math.abs(t.heading - 90) < 5 },
+        "3": { text: "Проедь назад на 50 шагов (backward).", check: (t) => Math.abs(t.x + 50) < 5 },
+        "4": { text: "Проедь 100 шагов и поверни направо (right) на 90 градусов.", check: (t) => Math.abs(t.x - 100) < 5 && Math.abs(t.heading - 270) < 5 },
+        "5": { text: "Сделай зигзаг: вперед 50, лево 90, вперед 50.", check: (t) => Math.abs(t.x - 50) < 5 && Math.abs(t.y - 50) < 5 },
+        "6": { text: "Нарисуй квадрат со стороной 100.", check: (t) => Math.abs(t.x) < 5 && Math.abs(t.y) < 5 },
+        "7": { text: "Нарисуй прямоугольник: вперед 150, право 90, вперед 50, право 90...", check: (t) => Math.abs(t.x) < 5 && Math.abs(t.y) < 5 },
+        "8": { text: "Нарисуй треугольник (три стороны по 100, повороты 120).", check: (t) => Math.abs(t.x) < 5 && Math.abs(t.y) < 5 },
+        "9": { text: "Нарисуй шестиугольник (повороты 60 градусов).", check: (t) => Math.abs(t.x) < 5 && Math.abs(t.y) < 5 },
+        "10": { text: "Миссия: База. Проедь 100 вперед, 100 влево, 100 назад, 100 вправо.", check: (t) => Math.abs(t.x) < 5 && Math.abs(t.y) < 5 }
     };
 
     function changeMission() {
@@ -87,6 +88,9 @@ rover.pensize(3)
         document.getElementById("goal-text").innerText = missions[m].text;
         document.getElementById("status-light").className = '';
         document.getElementById("check-msg").innerText = '';
+        // Очищаем канвас при смене миссии
+        const canvasDiv = document.getElementById("mycanvas");
+        canvasDiv.innerHTML = '';
     }
 
     function outf(text) { document.getElementById("output").innerHTML = text; } 
@@ -94,6 +98,15 @@ rover.pensize(3)
 
     function runit() { 
         let prog = document.getElementById("yourcode").value; 
+        // Добавляем автоматическую мгновенную скорость, чтобы проверка не срабатывала раньше времени
+        if (prog.includes('rover = turtle.Turtle()')) {
+            prog = prog.replace('rover = turtle.Turtle()', 'rover = turtle.Turtle(); rover.speed(0);');
+        }
+
+        document.getElementById("output").innerHTML = '';
+        document.getElementById("status-light").className = '';
+        document.getElementById("check-msg").innerText = 'СКАНИРОВАНИЕ...';
+
         Sk.pre = "output";
         Sk.configure({output:outf, read:builtinRead}); 
         (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
@@ -101,18 +114,26 @@ rover.pensize(3)
         Sk.misceval.asyncToPromise(() => {
             return Sk.importMainWithBody("<stdin>", false, prog, true);
         }).then(mod => {
-            let m = document.getElementById("missionSelect").value;
-            let roverObj = Sk.globals["rover"]; 
-            if (roverObj && missions[m].check(roverObj.tp)) {
-                document.getElementById("status-light").className = 'status-ok';
-                document.getElementById("check-msg").innerText = "ПОДТВЕРЖДЕНО!";
-                document.getElementById("check-msg").style.color = "#2ecc71";
-            } else {
-                document.getElementById("status-light").className = 'status-err';
-                document.getElementById("check-msg").innerText = "ОШИБКА КУРСА";
-                document.getElementById("check-msg").style.color = "#ff4d00";
-            }
-        }, err => { outf("<span style='color:red'>" + err.toString() + "</span>"); });
+            // Даем небольшую паузу 100мс на всякий случай
+            setTimeout(() => {
+                let m = document.getElementById("missionSelect").value;
+                let roverObj = Sk.globals["rover"]; 
+                
+                // В Skulpt данные черепашки лежат в roverObj.tp
+                if (roverObj && roverObj.tp && missions[m].check(roverObj.tp)) {
+                    document.getElementById("status-light").className = 'status-ok';
+                    document.getElementById("check-msg").innerText = "ПОДТВЕРЖДЕНО!";
+                    document.getElementById("check-msg").style.color = "#2ecc71";
+                } else {
+                    document.getElementById("status-light").className = 'status-err';
+                    document.getElementById("check-msg").innerText = "ОШИБКА КУРСА";
+                    document.getElementById("check-msg").style.color = "#ff4d00";
+                }
+            }, 100);
+        }, err => { 
+            outf("<span style='color:red'>" + err.toString() + "</span>"); 
+            document.getElementById("status-light").className = 'status-err';
+        });
     }
 </script>
 </body>
