@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Mars Rover Simulator</title>
+    <style>
+        body { background: #0b0c10; color: #66fcf1; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        #terminal { width: 90%; max-width: 600px; height: 400px; background: #1f2833; border: 2px solid #45a29e; border-radius: 10px; padding: 20px; box-shadow: 0 0 20px rgba(69, 162, 158, 0.3); display: flex; flex-direction: column; }
+        #output { flex-grow: 1; overflow-y: auto; margin-bottom: 10px; font-size: 14px; line-height: 1.4; }
+        #input-line { display: flex; gap: 10px; align-items: center; }
+        input { background: transparent; border: none; color: #fff; font-family: inherit; font-size: 16px; flex-grow: 1; outline: none; }
+        .error { color: #ff5555; }
+        .success { color: #50fa7b; }
+        .system { color: #888; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div id="terminal">
+    <div id="output">
+        <div class="system">[СИСТЕМА]: Связь установлена. Канал: MARS-GATE-1</div>
+        <div class="system">[ИНСТРУКЦИЯ]: Используй функцию print("сообщение"), чтобы проверить связь.</div>
+    </div>
+    <div id="input-line">
+        <span>&gt;&gt;&gt;</span>
+        <input type="text" id="commandInput" autofocus placeholder="Введите код Python...">
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById('commandInput');
+    const output = document.getElementById('output');
+
+    input.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            const val = input.value.trim();
+            addLine(`>>> ${val}`, 'white');
+            
+            // Простая имитация интерпретатора Python
+            if (val.startsWith('print(') && val.endsWith(')')) {
+                const match = val.match(/print\((['"])(.*?)\1\)/);
+                if (match) {
+                    setTimeout(() => {
+                        addLine(`[МАРС]: ${match[2]}`, 'success');
+                        addLine(`[СИСТЕМА]: Сигнал доставлен успешно. Тест пройден!`, 'system');
+                    }, 600);
+                } else {
+                    addLine("Ошибка синтаксиса: проверь кавычки внутри скобок!", "error");
+                }
+            } else if (val === "") {
+                // Ничего не делаем
+            } else {
+                addLine(`NameError: name '${val.split('(')[0]}' is not defined.`, "error");
+                addLine("Подсказка: Для вывода текста используй print()", "system");
+            }
+            
+            input.value = '';
+            output.scrollTop = output.scrollHeight;
+        }
+    });
+
+    function addLine(text, className) {
+        const div = document.createElement('div');
+        div.className = className;
+        div.textContent = text;
+        output.appendChild(div);
+    }
+</script>
+</body>
+</html>
