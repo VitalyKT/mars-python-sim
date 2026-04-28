@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Mars Rover - Print Module</title>
+    <style>
+        body { background: #0b0c10; color: #66fcf1; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        #terminal { width: 90%; max-width: 600px; background: #1f2833; border: 2px solid #45a29e; border-radius: 10px; padding: 20px; box-shadow: 0 0 20px rgba(69, 162, 158, 0.4); }
+        #output { height: 250px; overflow-y: auto; margin-bottom: 10px; font-size: 14px; }
+        .error { color: #ff4d00; font-weight: bold; }
+        .success { color: #2ecc71; text-shadow: 0 0 8px #2ecc71; }
+        .system { color: #888; }
+        #input-line { display: flex; border-top: 1px solid #45a29e; padding-top: 10px; }
+        input { background: transparent; border: none; color: #fff; font-family: inherit; font-size: 16px; flex-grow: 1; outline: none; }
+    </style>
+</head>
+<body>
+<div id="terminal">
+    <div id="output">
+        <div class="system">[СИСТЕМА]: Модуль print() готов к работе.</div>
+        <div class="system">[ЗАДАНИЕ]: Передай сообщение "Контакт" марсоходу, используя правильный синтаксис.</div>
+    </div>
+    <div id="input-line">
+        <span>>>>&nbsp;</span>
+        <input type="text" id="cmd" autofocus autocomplete="off">
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById('cmd');
+    const output = document.getElementById('output');
+
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const val = input.value.trim();
+            addLine(`>>> ${val}`, 'white');
+            
+            if (val === 'print("Контакт")' || val === "print('Контакт')") {
+                setTimeout(() => {
+                    addLine("📡 СИГНАЛ ПРИНЯТ!", "success");
+                    addLine("[МАРСОХОД]: На связи! Вижу сообщение на экране.", "success");
+                    addLine("🌕 МИССИЯ ВЫПОЛНЕНА. Переходи к следующему шагу.", "system");
+                }, 600);
+            } else if (!val.startsWith('print')) {
+                addLine("❌ ОШИБКА: Забыто имя модуля связи (print).", "error");
+            } else if (!val.includes('(') || !val.includes(')')) {
+                addLine("❌ ОШИБКА: Антенна не включена (забыты скобки).", "error");
+            } else if (!val.includes('"') && !val.includes("'")) {
+                addLine("❌ ОШИБКА: Сообщение без скафандра (кавычек) потеряно в вакууме.", "error");
+            } else {
+                addLine("❌ ОШИБКА СИНТАКСИСА: Проверь пробелы и кавычки.", "error");
+            }
+            input.value = '';
+            output.scrollTop = output.scrollHeight;
+        }
+    });
+
+    function addLine(text, cls) {
+        const d = document.createElement('div');
+        d.className = cls;
+        d.textContent = text;
+        output.appendChild(d);
+    }
+</script>
+</body>
+</html>
