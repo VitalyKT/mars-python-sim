@@ -4,63 +4,174 @@
     <meta charset="UTF-8">
     <title>Mars Rover - Print Module</title>
     <style>
-        body { background: #0b0c10; color: #66fcf1; font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        #terminal { width: 90%; max-width: 600px; background: #1f2833; border: 2px solid #45a29e; border-radius: 10px; padding: 20px; box-shadow: 0 0 20px rgba(69, 162, 158, 0.4); }
-        #output { height: 250px; overflow-y: auto; margin-bottom: 10px; font-size: 14px; }
-        .error { color: #ff4d00; font-weight: bold; }
+        :root {
+            --neon-cyan: #66fcf1;
+            --mars-red: #ff4d00;
+            --space-bg: #0b0c10;
+        }
+
+        body { 
+            background: var(--space-bg); 
+            color: var(--neon-cyan); 
+            font-family: 'Courier New', monospace; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+
+        #terminal { 
+            width: 95%; 
+            max-width: 650px; 
+            background: #1f2833; 
+            border: 2px solid #45a29e; 
+            border-radius: 12px; 
+            padding: 20px; 
+            box-shadow: 0 0 30px rgba(69, 162, 158, 0.3); 
+        }
+
+        /* Выделение задания */
+        #assignment-box {
+            background: rgba(102, 252, 241, 0.1);
+            border: 1px dashed var(--neon-cyan);
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        #assignment-title {
+            color: #fff;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        #assignment-text {
+            color: #fff;
+            font-size: 15px;
+        }
+
+        #output { 
+            height: 200px; 
+            overflow-y: auto; 
+            margin-bottom: 15px; 
+            font-size: 14px; 
+            border-bottom: 1px solid #333;
+        }
+
+        .error { color: var(--mars-red); font-weight: bold; }
         .success { color: #2ecc71; text-shadow: 0 0 8px #2ecc71; }
         .system { color: #888; }
-        #input-line { display: flex; border-top: 1px solid #45a29e; padding-top: 10px; }
-        input { background: transparent; border: none; color: #fff; font-family: inherit; font-size: 16px; flex-grow: 1; outline: none; }
+        .user-line { color: #fff; opacity: 0.8; }
+
+        #input-area { 
+            display: flex; 
+            gap: 10px;
+            align-items: center;
+        }
+
+        input { 
+            background: rgba(0,0,0,0.3); 
+            border: 1px solid #45a29e; 
+            color: #fff; 
+            font-family: inherit; 
+            font-size: 16px; 
+            padding: 10px;
+            border-radius: 5px;
+            outline: none; 
+            flex-grow: 1;
+        }
+
+        /* Кнопка ОТПРАВИТЬ */
+        #sendBtn {
+            background-color: #45a29e;
+            color: #0b0c10;
+            border: none;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        #sendBtn:hover {
+            background-color: var(--neon-cyan);
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
     </style>
 </head>
 <body>
+
 <div id="terminal">
-    <div id="output">
-        <div class="system">[СИСТЕМА]: Модуль print() готов к работе.</div>
-        <div class="system">[ЗАДАНИЕ]: Передай сообщение "Контакт" марсоходу, используя правильный синтаксис.</div>
+    <div id="assignment-box">
+        <span id="assignment-title">📍 ПРИКАЗ КОМАНДОВАНИЯ:</span>
+        <span id="assignment-text">Передай сообщение "Контакт" марсоходу, используя код: <code style="color:yellow">print("Контакт")</code></span>
     </div>
-    <div id="input-line">
-        <span>>>>&nbsp;</span>
-        <input type="text" id="cmd" autofocus autocomplete="off">
+
+    <div id="output">
+        <div class="system">[СИСТЕМА]: Модуль print() инициализирован.</div>
+        <div class="system">[СИСТЕМА]: Ожидание ввода по протоколу Python...</div>
+    </div>
+
+    <div id="input-area">
+        <span style="font-weight:bold">>>></span>
+        <input type="text" id="cmd" placeholder="Введите код здесь..." autofocus autocomplete="off">
+        <button id="sendBtn">ОТПРАВИТЬ</button>
     </div>
 </div>
 
 <script>
     const input = document.getElementById('cmd');
+    const sendBtn = document.getElementById('sendBtn');
     const output = document.getElementById('output');
 
-    input.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            const val = input.value.trim();
-            addLine(`>>> ${val}`, 'white');
-            
-            if (val === 'print("Контакт")' || val === "print('Контакт')") {
-                setTimeout(() => {
-                    addLine("📡 СИГНАЛ ПРИНЯТ!", "success");
-                    addLine("[МАРСОХОД]: На связи! Вижу сообщение на экране.", "success");
-                    addLine("🌕 МИССИЯ ВЫПОЛНЕНА. Переходи к следующему шагу.", "system");
-                }, 600);
-            } else if (!val.startsWith('print')) {
-                addLine("❌ ОШИБКА: Забыто имя модуля связи (print).", "error");
-            } else if (!val.includes('(') || !val.includes(')')) {
-                addLine("❌ ОШИБКА: Антенна не включена (забыты скобки).", "error");
-            } else if (!val.includes('"') && !val.includes("'")) {
-                addLine("❌ ОШИБКА: Сообщение без скафандра (кавычек) потеряно в вакууме.", "error");
-            } else {
-                addLine("❌ ОШИБКА СИНТАКСИСА: Проверь пробелы и кавычки.", "error");
-            }
-            input.value = '';
-            output.scrollTop = output.scrollHeight;
+    function processCommand() {
+        const val = input.value.trim();
+        if (!val) return;
+
+        addLine(`>>> ${val}`, 'user-line');
+        
+        // Проверка кода
+        if (val === 'print("Контакт")' || val === "print('Контакт')") {
+            setTimeout(() => {
+                addLine("📡 СИГНАЛ ПРОШЕЛ!", "success");
+                addLine("[МАРСОХОД]: Есть контакт! Сообщение выведено на главный экран.", "success");
+                addLine("🌕 МИССИЯ ВЫПОЛНЕНА. Кадет, ты настоящий Навигатор!", "system");
+            }, 600);
+        } else {
+            setTimeout(() => {
+                if (!val.startsWith('print')) {
+                    addLine("❌ ОШИБКА: Забыта команда передачи (print).", "error");
+                } else if (!val.includes('(') || !val.includes(')')) {
+                    addLine("❌ ОШИБКА: Забыты скобки модуля связи.", "error");
+                } else if (!val.includes('"') && !val.includes("'")) {
+                    addLine("❌ ОШИБКА: Текст без кавычек-скафандров потерян в космосе.", "error");
+                } else {
+                    addLine("❌ ОШИБКА СИНТАКСИСА: Проверь написание команды.", "error");
+                }
+            }, 400);
         }
-    });
+        
+        input.value = '';
+        output.scrollTop = output.scrollHeight;
+    }
+
+    sendBtn.onclick = processCommand;
+    input.addEventListener('keypress', (e) => { if (e.key === 'Enter') processCommand(); });
 
     function addLine(text, cls) {
         const d = document.createElement('div');
-        d.className = cls;
+        d.className = 'line ' + cls;
         d.textContent = text;
         output.appendChild(d);
+        output.scrollTop = output.scrollHeight;
     }
 </script>
+
 </body>
 </html>
