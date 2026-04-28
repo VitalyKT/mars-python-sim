@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mars Navigator Terminal</title>
+    <title>Mars Rover - First Contact</title>
     <style>
         :root {
             --neon-cyan: #66fcf1;
@@ -20,52 +20,40 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-        }
-
-        #terminal-container {
-            width: 90%;
-            max-width: 700px;
-            background: #1f2833;
-            border: 2px solid #45a29e;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 0 30px rgba(102, 252, 241, 0.1);
-            position: relative;
             overflow: hidden;
         }
 
-        /* Эффект помех */
-        #terminal-container::before {
-            content: " ";
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
-            z-index: 10;
+        #terminal-container {
+            width: 95%;
+            max-width: 650px;
+            background: #1f2833;
+            border: 2px solid #45a29e;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 0 25px rgba(102, 252, 241, 0.1);
+            position: relative;
         }
 
         #output {
-            height: 300px;
+            height: 280px;
             overflow-y: auto;
             margin-bottom: 20px;
-            padding-right: 10px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
 
-        .line { margin: 0; font-size: 14px; }
+        .line { margin: 0; font-size: 14px; line-height: 1.4; }
         .system { color: #888; font-style: italic; }
-        .error { color: var(--mars-red); font-weight: bold; }
-        .success { color: #2ecc71; text-shadow: 0 0 5px #2ecc71; }
-        .user-input { color: #fff; }
+        .error { color: var(--mars-red); font-weight: bold; border-left: 3px solid var(--mars-red); padding-left: 10px; }
+        .user-msg { color: #fff; font-weight: bold; }
+        .binary { color: #45a29e; font-size: 10px; opacity: 0.6; word-break: break-all; }
 
         #input-area {
             display: flex;
-            border-top: 1px solid #45a29e;
+            border-top: 1px solid #333;
             padding-top: 15px;
+            align-items: center;
         }
 
         #prompt { color: var(--neon-cyan); margin-right: 10px; font-weight: bold; }
@@ -80,84 +68,82 @@
             flex-grow: 1;
         }
 
-        /* Скроллбар */
-        #output::-webkit-scrollbar { width: 5px; }
-        #output::-webkit-scrollbar-thumb { background: #45a29e; border-radius: 10px; }
+        button {
+            background: #45a29e;
+            border: none;
+            color: #0b0c10;
+            padding: 8px 15px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+
+        button:hover { background: var(--neon-cyan); }
     </style>
 </head>
 <body>
 
 <div id="terminal-container">
-    <div style="text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 10px;">
-        <h3 style="margin: 0; letter-spacing: 2px;">📡 КОНСОЛЬ СВЯЗИ: ЗЕМЛЯ-МАРС</h3>
-        <small style="color: #45a29e;">Статус: Ожидание команды...</small>
+    <div style="text-align: center; margin-bottom: 15px;">
+        <h3 style="margin: 0; text-transform: uppercase; letter-spacing: 2px;">🛰️ ТЕРМИНАЛ СВЯЗИ "ЗЕМЛЯ-МАРС"</h3>
     </div>
 
     <div id="output">
-        <div class="line system">[СИСТЕМА]: Связь установлена через спутник MRO.</div>
-        <div class="line system">[СИСТЕМА]: Марсоход "Черепашка-1" готов к приему телеметрии.</div>
-        <div class="line">Попробуй отправить сообщение марсоходу (например: Привет).</div>
+        <div class="line system">[СИСТЕМА]: Соединение с объектом "Черепашка-1" установлено.</div>
+        <div class="line system">[СИСТЕМА]: Канал связи открыт. Ожидание команды от Навигатора...</div>
+        <div class="line" style="color: #fff;">Попробуй поздороваться с марсоходом или дай ему любую команду:</div>
     </div>
 
     <div id="input-area">
         <span id="prompt">>>></span>
-        <input type="text" id="commandInput" autofocus autocomplete="off" spellcheck="false">
+        <input type="text" id="commandInput" placeholder="Введите текст..." autofocus autocomplete="off">
+        <button id="sendBtn">ОТПРАВИТЬ</button>
     </div>
 </div>
 
 <script>
     const input = document.getElementById('commandInput');
+    const sendBtn = document.getElementById('sendBtn');
     const output = document.getElementById('output');
 
-    const responses = {
-        empty: "[ОШИБКА]: Эфир пуст. Введите команду.",
-        human: "❌ [ОШИБКА СИНТАКСИСА]: Ровер не понимает человеческую речь. Сигнал рассеян.",
-        noQuotes: "❌ [АТМОСФЕРНАЯ ОШИБКА]: Текст без кавычек \" \" сгорел в слоях атмосферы. Кавычки — это скафандр для слов!",
-        noParentheses: "⚠️ [ОШИБКА ПЕРЕДАТЧИКА]: Вы забыли нажать кнопку передачи (скобки). Используйте print( ... )",
-        success: "✅ [СВЯЗЬ УСТАНОВЛЕНА]: Сообщение успешно выведено на монитор ровера!"
-    };
-
-    input.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            const cmd = input.value.trim();
-            if (!cmd) return;
-
-            printToTerminal(`>>> ${cmd}`, 'user-input');
-            processCommand(cmd);
-            input.value = '';
-            output.scrollTop = output.scrollHeight;
-        }
-    });
-
-    function printToTerminal(text, className) {
-        const div = document.createElement('div');
-        div.className = 'line ' + className;
-        div.textContent = text;
-        output.appendChild(div);
+    function generateBinary(len) {
+        let res = "";
+        for(let i=0; i<len; i++) res += Math.round(Math.random());
+        return res;
     }
 
-    function processCommand(cmd) {
-        // Логика проверки
+    function process() {
+        const text = input.value.trim();
+        if (!text) return;
+
+        // Печатаем сообщение пользователя
+        const userDiv = document.createElement('div');
+        userDiv.className = 'line user-msg';
+        userDiv.textContent = `ЗЕМЛЯ: ${text}`;
+        output.appendChild(userDiv);
+
+        input.value = '';
+
+        // Имитация "задержки" сигнала и ошибки
         setTimeout(() => {
-            if (!cmd.includes('print')) {
-                printToTerminal(responses.human, 'error');
-                printToTerminal("Подсказка: Используй специальную функцию-передатчик: print()", "system");
-            } 
-            else if (!cmd.includes('(') || !cmd.includes(')')) {
-                printToTerminal(responses.noParentheses, 'error');
-            }
-            else if (!cmd.includes('"') && !cmd.includes("'")) {
-                printToTerminal(responses.noQuotes, 'error');
-                printToTerminal("Попробуй: print(\"Твое сообщение\")", "system");
-            }
-            else {
-                // Если всё правильно
-                const content = cmd.match(/\(([^)]+)\)/)[1].replace(/['"]/g, '');
-                printToTerminal(`[МАРС]: Принято сообщение -> "${content}"`, 'success');
-                printToTerminal(responses.success, 'system');
-            }
-        }, 500);
+            const binDiv = document.createElement('div');
+            binDiv.className = 'line binary';
+            binDiv.textContent = "[RAW DATA]: " + generateBinary(120);
+            output.appendChild(binDiv);
+
+            const errDiv = document.createElement('div');
+            errDiv.className = 'line error';
+            errDiv.innerHTML = `❌ ОШИБКА ПРОТОКОЛА: Команда "${text}" не распознана бортовым компьютером.<br>Статус: Несовместимый формат данных.`;
+            output.appendChild(errDiv);
+
+            output.scrollTop = output.scrollHeight;
+        }, 800);
     }
+
+    sendBtn.onclick = process;
+    input.onkeypress = (e) => { if(e.key === 'Enter') process(); };
 </script>
 
 </body>
