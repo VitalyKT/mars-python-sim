@@ -2,139 +2,48 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Mars Python IDE - 10 Missions</title>
     <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
     <style>
-        :root { --neon-cyan: #66fcf1; --mars-red: #ff4d00; --bg: #0b0c10; --panel: #1f2833; }
-        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 10px; display: flex; flex-direction: column; height: 98vh; overflow: hidden; }
-        .mission-header { display: flex; justify-content: space-between; align-items: center; background: var(--panel); padding: 10px 15px; border-radius: 8px; border: 1px solid var(--mars-red); margin-bottom: 8px; }
-        .mission-selector select { background: #000; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 5px; font-family: inherit; cursor: pointer; }
-        #mission-desc { background: rgba(102, 252, 241, 0.1); border-left: 4px solid var(--neon-cyan); padding: 12px; margin-bottom: 8px; font-size: 14px; min-height: 40px; }
-        #main-container { display: flex; gap: 10px; flex-grow: 1; min-height: 0; }
-        #editor-side { flex: 1.1; display: flex; flex-direction: column; }
-        #canvas-side { flex: 1; background: #1a0f0a; border: 2px solid #bf360c; border-radius: 8px; position: relative; }
-        textarea { background: #0b0c10; color: #fff; border: 1px solid #45a29e; padding: 15px; font-size: 14px; font-family: inherit; flex-grow: 1; resize: none; outline: none; }
-        .controls { display: flex; gap: 10px; padding: 10px 0; align-items: center; }
-        .run-btn { background: var(--mars-red); color: white; border: none; padding: 10px 20px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; flex-grow: 1; text-transform: uppercase; }
-        .run-btn:hover { background: #ff7043; box-shadow: 0 0 15px var(--mars-red); }
-        #status-light { width: 24px; height: 24px; border-radius: 50%; background: #333; }
-        .status-ok { background: #2ecc71 !important; box-shadow: 0 0 15px #2ecc71; }
-        .status-err { background: var(--mars-red) !important; }
-        #mycanvas { width: 100%; height: 100%; }
-        #output { color: #888; font-size: 11px; height: 30px; overflow: hidden; }
+        :root { --neon-cyan: #66fcf1; --mars-red: #ff4d00; --bg: #0b0c10; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 10px; height: 95vh; display: flex; flex-direction: column; }
+        #main-container { display: flex; gap: 10px; flex-grow: 1; }
+        #editor-side, #canvas-side { flex: 1; display: flex; flex-direction: column; }
+        textarea { background: #1f2833; color: #fff; border: 1px solid #45a29e; padding: 10px; font-size: 14px; flex-grow: 1; resize: none; outline: none; }
+        #mycanvas { background: #1a0f0a; border: 2px solid #bf360c; border-radius: 8px; flex-grow: 1; }
+        .run-btn { background: var(--mars-red); color: white; border: none; padding: 15px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px; }
+        #output { color: #888; font-size: 12px; height: 20px; }
     </style>
 </head>
 <body>
-
-<div class="mission-header">
-    <div style="font-weight: bold; color: var(--neon-cyan);">🛰️ ЦУП: ТЕРМИНАЛ НАВИГАЦИИ</div>
-    <div class="mission-selector">
-        УРОВЕНЬ: 
-        <select id="missionSelect" onchange="changeMission()">
-            <option value="1">1. Прямой курс</option>
-            <option value="2">2. Лево руля</option>
-            <option value="3">3. Обратный ход</option>
-            <option value="4">4. Прямой угол</option>
-            <option value="5">5. Зигзаг</option>
-            <option value="6">6. Разведка (Квадрат)</option>
-            <option value="7">7. Ангар (Прямоугольник)</option>
-            <option value="8">8. Купол (Треугольник)</option>
-            <option value="9">9. Склад (Шестиугольник)</option>
-            <option value="10">10. Возврат на базу</option>
-        </select>
-    </div>
-</div>
-
-<div id="mission-desc"><b>ЗАДАЧА:</b> <span id="goal-text">Проедь вперед на 100 метров (forward).</span></div>
-
-<div id="main-container">
-    <div id="editor-side">
-        <textarea id="yourcode" spellcheck="false">import turtle
+    <div id="main-container">
+        <div id="editor-side">
+            <textarea id="yourcode">import turtle
 rover = turtle.Turtle()
+rover.shape("turtle")
 rover.color("cyan")
-rover.pensize(3)
+rover.speed(5)
 
-# Твой код здесь:
+# ТВОЙ КОД ЗДЕСЬ:
 </textarea>
-        <div id="output"></div>
+            <button class="run-btn" onclick="runit()">ИСПОЛНИТЬ МАНЕВР ▶️</button>
+        </div>
+        <div id="canvas-side">
+            <div id="mycanvas"></div>
+            <div id="output"></div>
+        </div>
     </div>
-    <div id="canvas-side"><div id="mycanvas"></div></div>
-</div>
-
-<div class="controls">
-    <button class="run-btn" onclick="runit()">ИСПОЛНИТЬ КОД ▶️</button>
-    <div id="status-light"></div>
-    <div id="check-msg" style="font-size: 14px; min-width: 150px; text-align: center;"></div>
-</div>
 
 <script>
-    // 1. Уточненные миссии с проверкой координат
-    const missions = {
-        "1": { text: "Проедь вперед на 100 метров (forward).", check: (t) => Math.abs(t.x - 100) < 5 },
-        "2": { text: "Поверни ровер налево (left) на 90 градусов.", check: (t) => Math.abs(t.heading - 90) < 5 },
-        "3": { text: "Проедь назад на 50 метров (backward).", check: (t) => Math.abs(t.x + 50) < 5 },
-        "4": { text: "Проедь 100 и поверни направо (right) на 90 градусов.", check: (t) => Math.abs(t.x - 100) < 5 && (Math.abs(t.heading - 270) < 5 || Math.abs(t.heading + 90) < 5) },
-        "5": { text: "Сделай зигзаг: вперед 50, лево 90, вперед 50.", check: (t) => Math.abs(t.x - 50) < 5 && Math.abs(t.y - 50) < 5 },
-        "6": { text: "Нарисуй квадрат со стороной 100.", check: (t) => Math.abs(t.x) < 5 && Math.abs(t.y) < 5 },
-        "7": { text: "Нарисуй прямоугольник: вперед 150, право 90, вперед 50, право 90...", check: (t) => Math.abs(t.x) < 5 && Math.abs(t.y) < 5 },
-        "8": { text: "Нарисуй треугольник (три стороны по 100, повороты 120).", check: (t) => Math.abs(t.x) < 5 && Math.abs(t.y) < 5 },
-        "9": { text: "Нарисуй шестиугольник (повороты 60 градусов).", check: (t) => Math.abs(t.x) < 5 && Math.abs(t.y) < 5 },
-        "10": { text: "Миссия: База. Проедь 100 вперед, 100 влево, 100 назад, 100 вправо.", check: (t) => Math.abs(t.x) < 5 && Math.abs(t.y) < 5 }
-    };
-
-    function changeMission() {
-        let m = document.getElementById("missionSelect").value;
-        document.getElementById("goal-text").innerText = missions[m].text;
-        document.getElementById("status-light").className = '';
-        document.getElementById("check-msg").innerText = '';
-        document.getElementById("mycanvas").innerHTML = '';
-    }
-
-    function outf(text) { document.getElementById("output").innerHTML = text; } 
+    function outf(text) { document.getElementById("output").innerText = text; }
     function builtinRead(x) { return Sk.builtinFiles["files"][x]; }
-
-    function runit() { 
-        let prog = document.getElementById("yourcode").value; 
-        
-        // ПРИНУДИТЕЛЬНО ставим мгновенную скорость, если её нет
-        if (!prog.includes('speed')) {
-            prog = prog.replace('rover = turtle.Turtle()', 'rover = turtle.Turtle(); rover.speed(0);');
-        }
-
-        document.getElementById("output").innerHTML = '';
-        document.getElementById("status-light").className = '';
-        document.getElementById("check-msg").innerText = 'СКАНИРОВАНИЕ...';
-
-        Sk.pre = "output";
-        Sk.configure({output:outf, read:builtinRead}); 
+    function runit() {
+        let prog = document.getElementById("yourcode").value;
+        document.getElementById("mycanvas").innerHTML = '';
+        Sk.configure({output:outf, read:builtinRead});
         (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
-        
-        Sk.misceval.asyncToPromise(() => {
-            return Sk.importMainWithBody("<stdin>", false, prog, true);
-        }).then(mod => {
-            // Ждем подольше, чтобы координаты успели обновиться в памяти
-            setTimeout(() => {
-                let m = document.getElementById("missionSelect").value;
-                let roverObj = Sk.globals["rover"]; 
-                
-                // Проверяем наличие объекта и данных координат (tp - это internal turtle properties в Skulpt)
-                if (roverObj && roverObj.tp && missions[m].check(roverObj.tp)) {
-                    document.getElementById("status-light").className = 'status-ok';
-                    document.getElementById("check-msg").innerText = "ПОДТВЕРЖДЕНО!";
-                    document.getElementById("check-msg").style.color = "#2ecc71";
-                } else {
-                    document.getElementById("status-light").className = 'status-err';
-                    document.getElementById("check-msg").innerText = "ОШИБКА КУРСА";
-                    document.getElementById("check-msg").style.color = "#ff4d00";
-                    // Для отладки (выводит координаты в консоль браузера)
-                    if (roverObj && roverObj.tp) console.log("Текущие X:", roverObj.tp.x, "Y:", roverObj.tp.y);
-                }
-            }, 500); 
-        }, err => { 
-            outf("<span style='color:red'>" + err.toString() + "</span>"); 
-            document.getElementById("status-light").className = 'status-err';
-        });
+        Sk.misceval.asyncToPromise(() => Sk.importMainWithBody("<stdin>", false, prog, true))
+        .catch(err => outf(err.toString()));
     }
 </script>
 </body>
