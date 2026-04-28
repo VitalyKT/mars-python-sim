@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { background: #0b0c10; color: #66fcf1; font-family: 'Courier New', monospace; padding: 10px; margin: 0; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        .card { border: 1px solid #45a29e; border-radius: 8px; padding: 10px; background: #1f2833; text-align: center; }
+        .card h4 { margin: 0 0 10px 0; font-size: 14px; color: #ff4d00; }
+        .shape { width: 80px; height: 80px; border: 1px solid #333; margin: 0 auto 10px; position: relative; background: #000; }
+        /* Рисуем фигурки на CSS для легкости */
+        .line { width: 50px; height: 2px; background: cyan; position: absolute; top: 40px; left: 15px; }
+        .corner { width: 40px; height: 40px; border-top: 2px solid cyan; border-right: 2px solid cyan; position: absolute; top: 25px; left: 20px; }
+        .square { width: 40px; height: 40px; border: 2px solid cyan; position: absolute; top: 20px; left: 20px; }
+        .rect { width: 60px; height: 30px; border: 2px solid cyan; position: absolute; top: 25px; left: 10px; }
+        .tri { width: 0; height: 0; border-left: 25px solid transparent; border-right: 25px solid transparent; border-bottom: 40px solid cyan; position: absolute; top: 20px; left: 15px; }
+        .tri::after { content: ''; position: absolute; width: 0; height: 0; border-left: 22px solid transparent; border-right: 22px solid transparent; border-bottom: 36px solid #000; top: 3px; left: -22px; }
+        .desc { font-size: 11px; color: #fff; }
+    </style>
+</head>
+<body>
+    <h3 style="text-align:center; margin-top:0;">🗺️ АТЛАС ПОЛЕТНЫХ ЗАДАНИЙ</h3>
+    <div class="grid">
+        <div class="card"><h4>1. Линия</h4><div class="shape"><div class="line"></div></div><div class="desc">forward(100)</div></div>
+        <div class="card"><h4>2. Поворот</h4><div class="shape"><div class="corner" style="border-top:none; border-left:2px solid cyan;"></div></div><div class="desc">left(90)</div></div>
+        <div class="card"><h4>4. Угол</h4><div class="shape"><div class="corner"></div></div><div class="desc">forward + right</div></div>
+        <div class="card"><h4>6. Квадрат</h4><div class="shape"><div class="square"></div></div><div class="desc">4 раза по 100</div></div>
+        <div class="card"><h4>7. Ангар</h4><div class="shape"><div class="rect"></div></div><div class="desc">150 на 50</div></div>
+        <div class="card"><h4>8. Купол</h4><div class="shape"><div class="tri"></div></div><div class="desc">Углы 120°</div></div>
+    </div>
+</body>
+</html>
