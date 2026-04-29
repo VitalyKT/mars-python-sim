@@ -5,38 +5,44 @@
     <style>
         :root { --neon: #66fcf1; --mars: #ff4d00; --bg: #0b0c10; --card: #1f2833; }
         body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 15px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-        .card { background: var(--card); border: 1px solid var(--neon); border-radius: 8px; padding: 10px; text-align: center; }
-        .shape { width: 60px; height: 60px; margin: 0 auto 10px; border: 1px solid #333; position: relative; background: #000; }
-        /* Рисуем иконки через CSS */
-        .line { width: 40px; height: 2px; background: var(--neon); position: absolute; top: 30px; left: 10px; }
-        .angle { width: 30px; height: 30px; border-top: 2px solid var(--neon); border-right: 2px solid var(--neon); position: absolute; top: 15px; left: 15px; }
-        .back { width: 40px; height: 2px; border-bottom: 2px dashed var(--mars); position: absolute; top: 30px; left: 10px; }
-        .title { font-size: 12px; color: var(--mars); font-weight: bold; margin-bottom: 5px; }
-        code { font-size: 10px; color: #ccc; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+        .card { background: var(--card); border: 1px solid var(--neon); border-radius: 8px; padding: 10px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
+        .shape { width: 50px; height: 50px; margin: 0 auto 10px; border: 1px solid #333; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
+        /* Иконки CSS */
+        .line { width: 35px; height: 2px; background: var(--neon); }
+        .angle { width: 25px; height: 25px; border-top: 2px solid var(--neon); border-right: 2px solid var(--neon); margin-top: 10px; margin-right: 10px; }
+        .back { width: 35px; height: 2px; border-bottom: 2px dashed var(--mars); }
+        .home-icon { font-size: 24px; color: var(--neon); }
+        .title { font-size: 11px; color: var(--mars); font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
+        code { font-size: 10px; color: #ccc; display: block; margin-top: 5px; }
     </style>
 </head>
 <body>
     <div class="grid">
         <div class="card">
-            <div class="title">ПРЯМОЙ ХОД</div>
+            <div class="title">Вперед</div>
             <div class="shape"><div class="line"></div></div>
             <code>forward(100)</code>
         </div>
         <div class="card">
-            <div class="title">ПРАВЫЙ УГОЛ</div>
-            <div class="shape"><div class="angle"></div></div>
-            <code>right(90)</code>
-        </div>
-        <div class="card">
-            <div class="title">ЗАДНИЙ ХОД</div>
+            <div class="title">Назад</div>
             <div class="shape"><div class="back"></div></div>
             <code>backward(100)</code>
         </div>
         <div class="card">
-            <div class="title">РАЗВОРОТ</div>
-            <div class="shape" style="border-radius:50%; border: 2px dashed var(--neon);"></div>
-            <code>left(180)</code>
+            <div class="title">Направо</div>
+            <div class="shape"><div class="angle"></div></div>
+            <code>right(90)</code>
+        </div>
+        <div class="card">
+            <div class="title">Налево</div>
+            <div class="shape"><div class="angle" style="transform: rotate(-90deg); margin-right: 0; margin-left: 10px;"></div></div>
+            <code>left(90)</code>
+        </div>
+        <div class="card" style="border-color: var(--mars);">
+            <div class="title" style="color: var(--neon);">НА БАЗУ</div>
+            <div class="shape"><span class="home-icon">🏠</span></div>
+            <code>home()</code>
         </div>
     </div>
 </body>
