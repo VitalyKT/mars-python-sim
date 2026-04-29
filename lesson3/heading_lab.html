@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+    <style>
+        :root { --neon: #66fcf1; --mars: #ff4d00; --bg: #0b0c10; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 15px; display: flex; flex-direction: column; height: 95vh; overflow: hidden; }
+        .mission-box { background: rgba(102, 252, 241, 0.05); padding: 12px; border-radius: 8px; border-left: 4px solid var(--neon); margin-bottom: 15px; font-size: 14px; }
+        #lab { display: flex; gap: 15px; flex-grow: 1; min-height: 0; }
+        #editor-side, #canvas-side { flex: 1; display: flex; flex-direction: column; }
+        textarea { background: #000; color: var(--neon); border: 1px solid #444; padding: 15px; font-size: 15px; flex-grow: 1; resize: none; outline: none; border-radius: 5px; }
+        #mycanvas { background: #1a0f0a; border: 2px solid #333; border-radius: 10px; flex-grow: 1; }
+        .run-btn { background: var(--mars); color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; text-transform: uppercase; }
+        #status { font-size: 13px; color: #888; margin-top: 5px; height: 20px; text-align: center; }
+        .compass-hint { display: flex; justify-content: space-around; margin-bottom: 10px; font-size: 11px; color: var(--neon); }
+    </style>
+</head>
+<body>
+
+    <h2 style="color: var(--neon); text-align: center; margin: 0 0 10px 0;">🧭 ОРИЕНТАЦИЯ ПО ПРИБОРАМ</h2>
+
+    <div class="mission-box">
+        <strong>ЗАДАНИЕ:</strong> Наш ровер сбился с курса! <br>
+        Используй <code>setheading()</code>, чтобы развернуть его строго на <b>Север (90)</b> и проехать 100 шагов, а затем на <b>Запад (180)</b> и проехать еще 100.
+    </div>
+
+    <div class="compass-hint">
+        <span>0° - Право</span> | <span>90° - Вверх</span> | <span>180° - Лево</span> | <span>270° - Вниз</span>
+    </div>
+
+    <div id="lab">
+        <div id="editor-side">
+            <textarea id="yourcode" spellcheck="false">import turtle
+rover = turtle.Turtle()
+rover.shape("turtle")
+rover.color("cyan")
+rover.speed(5)
+
+# Ровер запутался:
+rover.left(43) 
+
+# === ТВОЙ КОД НИЖЕ ===
+# Разверни на Север (90) и проедь 100
+
+# Разверни на Запад (180) и проедь 100
+</textarea>
+            <button class="run-btn" onclick="runit()">ОТКАЛИБРОВАТЬ КУРС ▶️</button>
+        </div>
+        <div id="canvas-side">
+            <div id="mycanvas"></div>
+            <div id="status"></div>
+        </div>
+    </div>
+
+<script>
+    function outf(text) { console.log(text); }
+    function builtinRead(x) { return Sk.builtinFiles["files"][x]; }
+    
+    function runit() {
+        const prog = document.getElementById("yourcode").value;
+        const status = document.getElementById("status");
+        document.getElementById("mycanvas").innerHTML = '';
+        status.innerText = "📡 СИНХРОНИЗАЦИЯ С КОМПАСОМ...";
+
+        Sk.configure({output:outf, read:builtinRead});
+        (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
+        
+        Sk.misceval.asyncToPromise(() => {
+            return Sk.importMainWithBody("<stdin>", false, prog, true);
+        }).then(() => {
+            if (prog.includes('setheading')) {
+                status.innerText = "✅ КУРС СТАБИЛИЗИРОВАН!";
+                status.style.color = "#2ecc71";
+            } else {
+                status.innerText = "⚠️ Используй setheading() для точного поворота.";
+                status.style.color = "#f1fa8c";
+            }
+        }).catch(err => {
+            status.innerText = "❌ ОШИБКА: " + err.toString();
+        });
+    }
+</script>
+</body>
+</html>
