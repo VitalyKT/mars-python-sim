@@ -8,22 +8,20 @@
         :root { --neon: #66fcf1; --mars: #ff4d00; --bg: #0b0c10; --card: #1f2833; }
         body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 15px; display: flex; flex-direction: column; height: 95vh; overflow: hidden; }
         
-        /* Сетка шпаргалок (карточки сверху) */
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-        .card { background: var(--card); border: 1px solid var(--mars); border-radius: 8px; padding: 10px; text-align: center; font-size: 12px; }
+        /* Карточки-подсказки (только 4 штуки) */
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+        .card { background: var(--card); border: 1px solid var(--mars); border-radius: 8px; padding: 10px; text-align: center; }
         .preview { height: 35px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; background: #000; border-radius: 4px; }
-        .card-title { color: var(--neon); font-weight: bold; margin-bottom: 5px; text-transform: uppercase; font-size: 11px; }
-        code { color: #f1fa8c; font-size: 11px; }
+        .card-title { color: var(--neon); font-weight: bold; margin-bottom: 3px; text-transform: uppercase; font-size: 11px; }
+        code { color: #f1fa8c; font-size: 10px; }
 
-        /* Инструкция */
-        .mission-box { background: rgba(102, 252, 241, 0.05); padding: 12px; border-radius: 8px; border-left: 4px solid var(--mars); margin-bottom: 15px; font-size: 13px; color: #ccc; }
+        .mission-box { background: rgba(102, 252, 241, 0.05); padding: 10px; border-radius: 8px; border-left: 4px solid var(--mars); margin-bottom: 15px; font-size: 13px; color: #ccc; }
 
-        /* Лаборатория (Редактор + Поле) */
         #lab { display: flex; gap: 15px; flex-grow: 1; min-height: 0; }
         #editor-side, #canvas-side { flex: 1; display: flex; flex-direction: column; }
         textarea { background: #000; color: var(--neon); border: 1px solid #444; padding: 15px; font-size: 15px; flex-grow: 1; resize: none; outline: none; border-radius: 5px; }
         #mycanvas { background: #1a0f0a; border: 2px solid #bf360c; border-radius: 10px; flex-grow: 1; }
-        .run-btn { background: var(--mars); color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; text-transform: uppercase; }
+        .run-btn { background: var(--mars); color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; }
         #log { font-size: 12px; color: #888; margin-top: 5px; height: 15px; }
     </style>
 </head>
@@ -31,30 +29,30 @@
 
     <div class="grid">
         <div class="card">
-            <div class="card-title">Цвет</div>
-            <div class="preview"><div style="width:15px; height:15px; background:lime; border-radius:50%; box-shadow: 0 0 10px lime;"></div></div>
-            <code>color("lime")</code>
+            <div class="card-title">ЦВЕТ</div>
+            <div class="preview"><div style="width:15px; height:15px; background:cyan; border-radius:50%; box-shadow: 0 0 10px cyan;"></div></div>
+            <code>color("cyan")</code>
         </div>
         <div class="card">
-            <div class="card-title">Толщина</div>
-            <div class="preview"><div style="width:70%; height:6px; background:var(--neon);"></div></div>
+            <div class="card-title">ТОЛЩИНА</div>
+            <div class="preview"><div style="width:70%; height:8px; background:var(--neon); border-radius:4px;"></div></div>
             <code>pensize(10)</code>
         </div>
         <div class="card">
-            <div class="card-title">Форма</div>
+            <div class="card-title">ФОРМА</div>
             <div class="preview" style="font-size: 20px;">🐢</div>
             <code>shape("turtle")</code>
         </div>
         <div class="card">
-            <div class="card-title">Скорость</div>
+            <div class="card-title">СКОРОСТЬ</div>
             <div class="preview" style="color:var(--mars); font-size: 18px;">⚡⚡</div>
             <code>speed(0)</code>
         </div>
     </div>
 
     <div class="mission-box">
-        <strong>ЗАДАНИЕ:</strong> Настрой ровер по протоколу ЦУП!<br>
-        1. Форма: <b>"turtle"</b> | 2. Толщина линии: <b>10</b> | 3. Скорость: <b>0</b> (мгновенно)
+        <strong>ИНЖЕНЕРНАЯ ЗАДАЧА:</strong><br>
+        Настрой ровер: форма <b>"turtle"</b>, цвет <b>"lime"</b> (или любой другой), толщина <b>10</b> и мгновенная скорость <b>0</b>.
     </div>
 
     <div id="lab">
@@ -62,15 +60,15 @@
             <textarea id="yourcode" spellcheck="false">import turtle
 rover = turtle.Turtle()
 
-# === ТВОЙ ТЮНИНГ ЗДЕСЬ ===
-# 1. Смени форму (shape)
-# 2. Выбери яркий цвет (color)
-# 3. Установи толщину 10 (pensize)
-# 4. Включи скорость 0 (speed)
-# ========================
+# Напиши настройки ниже:
+rover.shape("turtle")
+rover.color("cyan")
+rover.pensize(5)
+rover.speed(5)
 
-rover.forward(100)</textarea>
-            <button class="run-btn" onclick="runit()">ПРИМЕНИТЬ НАСТРОЙКИ ▶️</button>
+# Команда движения:
+rover.forward(150)</textarea>
+            <button class="run-btn" onclick="runit()">ОБНОВИТЬ СИСТЕМЫ ▶️</button>
         </div>
         <div id="canvas-side">
             <div id="mycanvas"></div>
@@ -84,20 +82,13 @@ rover.forward(100)</textarea>
     
     function runit() {
         const prog = document.getElementById("yourcode").value;
-        const log = document.getElementById("log");
         document.getElementById("mycanvas").innerHTML = '';
-        log.innerText = "🛠️ ИНЖЕНЕРНЫЙ ТЕСТ ЗАПУЩЕН...";
-
+        document.getElementById("log").innerText = "🛠️ ПРОВЕРКА КОНФИГУРАЦИИ...";
         Sk.configure({output:outf, read:builtinRead});
         (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
-        
-        Sk.misceval.asyncToPromise(() => {
-            return Sk.importMainWithBody("<stdin>", false, prog, true);
-        }).then(() => {
-            log.innerText = "✅ СИСТЕМЫ СТАБИЛЬНЫ";
-        }).catch(err => {
-            log.innerText = "❌ ОШИБКА: " + err.toString();
-        });
+        Sk.misceval.asyncToPromise(() => Sk.importMainWithBody("<stdin>", false, prog, true))
+        .then(() => document.getElementById("log").innerText = "✅ ГОТОВО")
+        .catch(err => document.getElementById("log").innerText = "❌ ОШИБКА: " + err.toString());
     }
 </script>
 </body>
