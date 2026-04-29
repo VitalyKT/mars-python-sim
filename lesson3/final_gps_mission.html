@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+    <style>
+        :root { --neon: #66fcf1; --mars: #ff4d00; --bg: #0b0c10; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 10px; display: flex; flex-direction: column; height: 98vh; overflow: hidden; }
+        #header { border-bottom: 2px solid var(--neon); padding-bottom: 5px; margin-bottom: 10px; text-align: center; }
+        #main { display: flex; gap: 10px; flex-grow: 1; min-height: 0; }
+        #editor-side, #canvas-side { flex: 1; display: flex; flex-direction: column; }
+        textarea { background: #000; color: var(--neon); border: 1px solid #444; padding: 15px; font-size: 14px; flex-grow: 1; resize: none; outline: none; border-radius: 5px; line-height: 1.5; }
+        #mycanvas { background: #1a0f0a; border: 2px solid #bf360c; border-radius: 10px; flex-grow: 1; }
+        .run-btn { background: var(--mars); color: #fff; border: none; padding: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; text-transform: uppercase; }
+        #terminal { background: #000; color: #2ecc71; padding: 10px; font-size: 13px; border: 1px solid #222; margin-top: 5px; height: 80px; overflow-y: auto; border-radius: 5px; }
+        .mission-box { background: rgba(102, 252, 241, 0.05); padding: 10px; border-radius: 5px; border-left: 4px solid var(--neon); margin-bottom: 10px; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+    <div id="header"><h3 style="margin:0; color:var(--neon)">🏆 ЭКЗАМЕН: ГЛАВНЫЙ НАВИГАТОР</h3></div>
+
+    <div id="main">
+        <div id="editor-side">
+            <div class="mission-box">
+                <b>ПОЛЕТНОЕ ЗАДАНИЕ:</b><br>
+                1. Тюнинг: форма "turtle", цвет "orange", скорость 5.<br>
+                2. Лети в точку <b>(150, 150)</b>.<br>
+                3. Отправь по радио (print) свои координаты X и Y.<br>
+                4. Развернись на <b>Запад (180)</b> по компасу.<br>
+                5. Подними перо и лети в <b>(-150, -150)</b>.
+            </div>
+            <textarea id="yourcode" spellcheck="false"># Напиши код миссии с нуля!
+import turtle
+rover = turtle.Turtle()
+
+</textarea>
+            <button class="run-btn" onclick="runit()">ЗАПУСТИТЬ ПРОГРАММУ ▶️</button>
+            <div id="terminal">ЦУП: Ожидание сеанса связи...</div>
+        </div>
+        <div id="canvas-side">
+            <div id="mycanvas"></div>
+        </div>
+    </div>
+
+<script>
+    function outf(text) { 
+        const term = document.getElementById("terminal");
+        if (term.innerText.includes("Ожидание")) term.innerText = "";
+        term.innerText += "📡 СИГНАЛ: " + text + "\n";
+        term.scrollTop = term.scrollHeight;
+    }
+    function builtinRead(x) { return Sk.builtinFiles["files"][x]; }
+    
+    function runit() {
+        const prog = document.getElementById("yourcode").value;
+        const term = document.getElementById("terminal");
+        document.getElementById("mycanvas").innerHTML = '';
+        term.innerText = "📡 ЗАПУСК СИСТЕМ...\n";
+        term.style.color = "#2ecc71";
+
+        Sk.configure({output:outf, read:builtinRead});
+        (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
+        
+        Sk.misceval.asyncToPromise(() => {
+            return Sk.importMainWithBody("<stdin>", false, prog, true);
+        }).then(() => {
+            const code = document.getElementById("yourcode").value;
+            const hasGps = code.includes('goto') || (code.includes('setx') && code.includes('sety'));
+            const hasRadio = code.includes('print') && (code.includes('xcor') || code.includes('ycor'));
+            const hasCompass = code.includes('setheading') || code.includes('seth(');
+            const hasJump = code.includes('penup');
+
+            if (hasGps && hasRadio && hasCompass && hasJump) {
+                outf("🏆 ЭКЗАМЕН СДАН! Ты — лучший навигатор Марса.");
+            } else {
+                outf("⚠️ Проверь выполнение всех пунктов задания.");
+            }
+        }).catch(err => {
+            outf("❌ ОШИБКА: " + err.toString());
+            term.style.color = "#ff4d00";
+        });
+    }
+</script>
+</body>
+</html>
