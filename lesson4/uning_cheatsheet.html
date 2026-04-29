@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Turtle Engineering Tuning Cheat Sheet</title>
+    <style>
+        :root {
+            --neon-cyan: #66fcf1;
+            --mars-red: #ff4d00;
+            --bg: #0b0c10;
+            --panel: #1f2833;
+            --text: #fff;
+            --code-key: #f1fa8c; /* Желтый для команд */
+            --code-obj: #8be9fd; /* Голубой для объектов */
+            --code-arg: #ff79c6; /* Розовый для параметров */
+            --code-str: #abe9b3; /* Зеленый для строк */
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 900px;
+            border: 2px solid var(--neon-cyan);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(102, 252, 241, 0.2);
+            background: rgba(31, 40, 51, 0.5);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 24px;
+            margin-top: 0;
+            border-bottom: 2px solid var(--neon-cyan);
+            padding-bottom: 10px;
+        }
+
+        h2.tuning-header {
+            color: var(--mars-red);
+            text-align: center;
+            font-size: 18px;
+            margin-top: -5px;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border-left: 4px solid var(--mars-red);
+        }
+
+        .section-title {
+            font-size: 17px;
+            font-weight: bold;
+            color: var(--mars-red);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .term {
+            color: var(--neon-cyan);
+            font-weight: bold;
+        }
+
+        .desc {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            color: #ccc;
+        }
+
+        .code-block {
+            background: #000;
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+
+        /* Цветовая подсветка */
+        .comment { color: #6272a4; font-style: italic; }
+        .keyword { color: var(--code-obj); }
+        .object { color: #fff; }
+        .method { color: var(--code-key); }
+        .arg-num { color: var(--code-arg); }
+        .arg-str { color: var(--code-str); }
+
+        /* Таблица для визуализации параметров */
+        .params-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .params-table th, .params-table td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #333;
+        }
+
+        .params-table th { color: var(--neon-cyan); }
+
+        /* Визуальные примеры */
+        .visual-example {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            vertical-align: middle;
+            margin-right: 5px;
+            border: 1px solid #fff;
+        }
+
+        .speed-bar {
+            display: inline-block;
+            height: 10px;
+            background: var(--mars-red);
+            border-radius: 5px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <h1>ГЛАВА 1.5: ГЛУБОКИЙ ТЮНИНГ СИСТЕМ</h1>
+    <h2 class="tuning-header">🛰️ ПРОТОКОЛ НАСТРОЙКИ ОБЪЕКТА ROVER</h2>
+
+    <div class="section">
+        <div class="section-title">🛸 1. Смена корпуса (Shape)</div>
+        <div class="desc">
+            <span class="term">Метод `shape()`</span> меняет внешний вид ровера на поверхности.<br>
+            Доступные "скины": <span class="arg-str">"turtle"</span> (черепаха), <span class="arg-str">"circle"</span> (зонд), <span class="arg-str">"square"</span> (модуль), <span class="arg-str">"triangle"</span>, <span class="arg-str">"arrow"</span>.
+        </div>
+        <div class="code-block">
+            <span class="object">rover</span>.<span class="method">shape</span>(<span class="arg-str">"turtle"</span>) <span class="comment"># Активировать режим "Черепаха"</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">🎨 2. Лазерный след (Color & Pensize)</div>
+        <div class="desc">
+            Настройка цвета и толщины разведывательной линии.
+        </div>
+        
+        <table class="params-table">
+            <tr>
+                <th>Команда</th>
+                <th>Описание</th>
+                <th>Визуализация</th>
+            </tr>
+            <tr>
+                <td><code class="object">rover</span>.<span class="method">color</span>(<span class="arg-str">"lime"</span>)</td>
+                <td>Цвет ровера и следа (имя в кавычках)</td>
+                <td>
+                    <span class="visual-example" style="background:lime;"></span> lime
+                    <span class="visual-example" style="background:cyan;"></span> cyan
+                    <span class="visual-example" style="background:gold;"></span> gold
+                </td>
+            </tr>
+            <tr>
+                <td><code class="object">rover</span>.<span class="method">pensize</span>(<span class="arg-num">10</span>)</td>
+                <td>Толщина линии в пикселях</td>
+                <td>
+                    <div style="border-bottom: 2px solid cyan; width: 40px; display:inline-block;">2</div>
+                    <div style="border-bottom: 6px solid cyan; width: 40px; display:inline-block; margin-left:10px;">6</div>
+                    <div style="border-bottom: 12px solid cyan; width: 40px; display:inline-block; margin-left:10px;">12</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="section-title">🚀 3. Режим Полета (Penup / Pendown)</div>
+        <div class="desc">
+            Перемещение без рисования следа на песке.
+        </div>
+        <div class="code-block">
+            <span class="object">rover</span>.<span class="method">penup</span>()   <span class="comment"># Поднять оборудование (режим полета)</span><br>
+            <span class="object">rover</span>.<span class="method">forward</span>(<span class="arg-num">100</span>) <span class="comment"># Летит 100 метров БЕЗ ЛИНИИ</span><br>
+            <span class="object">rover</span>.<span class="method">pendown</span>() <span class="comment"># Опустить оборудование (режим рисования)</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">🌌 4. Атмосфера (Bgcolor)</div>
+        <div class="desc">
+            Настройка фона космоса или поверхности Марса. Требует обращения к объекту <span class="term">Screen</span>.
+        </div>
+        <div class="code-block">
+            <span class="object">screen</span> = turtle.<span class="method">Screen</span>() <span class="comment"># Доступ к экрану</span><br>
+            <span class="object">screen</span>.<span class="method">bgcolor</span>(<span class="arg-str">"#1a0f0a"</span>) <span class="comment"># Темно-оранжевый фон</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">⚡ 5. Скорость двигателей (Speed)</div>
+        <div class="desc">
+            Установка скорости анимации перемещения (от 0 до 10).
+        </div>
+        
+        <table class="params-table" style="text-align:center;">
+            <tr>
+                <th>Число</th>
+                <th>Режим</th>
+                <th>Визуализация</th>
+            </tr>
+            <tr>
+                <td><span class="arg-num">1</span></td>
+                <td>Очень медленно</td>
+                <td><span class="speed-bar" style="width:10px;"></span></td>
+            </tr>
+            <tr>
+                <td><span class="arg-num">6</span></td>
+                <td>Нормально</td>
+                <td><span class="speed-bar" style="width:60px;"></span></td>
+            </tr>
+            <tr>
+                <td><span class="arg-num">0</span></td>
+                <td><strong>МГНОВЕННО (Телепорт)</strong></td>
+                <td><span class="speed-bar" style="width:100px; background:var(--neon-cyan);"></span></td>
+            </tr>
+        </table>
+        <div class="code-block" style="margin-top:10px;">
+            <span class="object">rover</span>.<span class="method">speed</span>(<span class="arg-num">0</span>) <span class="comment"># Полный форсаж</span>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
