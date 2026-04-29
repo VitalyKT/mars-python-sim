@@ -2,63 +2,51 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
     <style>
-        :root { --neon: #66fcf1; --bg: #0b0c10; }
-        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; padding: 20px; text-align: center; }
-        #terminal { background: #000; border: 2px solid #444; border-radius: 10px; padding: 20px; max-width: 600px; margin: 0 auto; text-align: left; }
-        textarea { width: 100%; background: transparent; color: var(--neon); border: none; outline: none; font-size: 18px; resize: none; height: 100px; }
-        #status-panel { margin-top: 20px; padding: 15px; border-radius: 5px; background: #1f2833; display: none; }
-        .success { color: #2ecc71; font-weight: bold; }
-        .btn { background: var(--neon); color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; }
-        #rover-view { width: 100px; height: 100px; margin: 20px auto; display: none; border: 2px dashed var(--neon); border-radius: 50%; padding: 10px; }
+        :root { --neon: #66fcf1; --bg: #0b0c10; --error: #ff4d00; --success: #2ecc71; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; padding: 20px; margin: 0; text-align: center; }
+        .terminal-box { background: #000; border: 2px solid #444; border-radius: 10px; padding: 15px; max-width: 500px; margin: 0 auto; box-shadow: 0 0 15px rgba(102, 252, 241, 0.1); }
+        textarea { width: 90%; background: transparent; color: var(--neon); border: none; outline: none; font-size: 16px; resize: none; height: 80px; }
+        .btn { background: var(--neon); color: #000; border: none; padding: 12px 25px; font-weight: bold; cursor: pointer; margin-top: 15px; border-radius: 5px; text-transform: uppercase; }
+        #status { margin-top: 20px; min-height: 50px; font-size: 14px; }
+        .rover-icon { width: 80px; height: 80px; margin: 10px auto; display: none; filter: drop-shadow(0 0 5px var(--neon)); }
     </style>
 </head>
 <body>
-    <h2>🔐 СИСТЕМА АКТИВАЦИИ РОВЕРА</h2>
-    <p>Введите протокол запуска, чтобы оживить Пионера-1</p>
-
-    <div id="terminal">
-        <textarea id="code" placeholder="# Напиши команды активации здесь..."></textarea>
+    <div class="terminal-box">
+        <div style="color: #444; font-size: 10px; margin-bottom: 10px; text-align: left;">BOOT_SEQUENCE_TERMINAL v.1.0</div>
+        <textarea id="code" placeholder="# Введи команды здесь..."></textarea>
     </div>
-    <button class="btn" onclick="checkBoot()">ВЫПОЛНИТЬ ЗАПУСК ▶️</button>
+    
+    <button class="btn" onclick="checkBoot()">АКТИВИРОВАТЬ ▶️</button>
 
-    <div id="status-panel">
-        <div id="msg"></div>
-        <div id="rover-view">
-            <svg viewBox="0 0 100 100" width="80" height="80">
-                <rect x="30" y="30" width="40" height="30" fill="#cfd8dc" />
-                <rect x="25" y="25" width="10" height="10" fill="#263238" />
-                <rect x="65" y="25" width="10" height="10" fill="#263238" />
-                <rect x="25" y="65" width="10" height="10" fill="#263238" />
-                <rect x="65" y="65" width="10" height="10" fill="#263238" />
-                <rect x="55" y="40" width="10" height="10" fill="#546e7a" />
-                <line x1="70" y1="45" x2="90" y2="45" stroke="#ffff00" stroke-width="4" />
-            </svg>
-        </div>
-    </div>
+    <div id="status"></div>
+    
+    <svg class="rover-icon" id="rover" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="40" stroke="#66fcf1" stroke-width="2" fill="none" />
+        <path d="M30 60 L70 60 L60 40 L40 40 Z" fill="#66fcf1" />
+        <circle cx="35" cy="65" r="5" fill="#fff" />
+        <circle cx="65" cy="65" r="5" fill="#fff" />
+        <line x1="50" y1="40" x2="50" y2="25" stroke="#fff" stroke-width="2" />
+    </svg>
 
 <script>
     function checkBoot() {
         const code = document.getElementById('code').value;
-        const panel = document.getElementById('status-panel');
-        const msg = document.getElementById('msg');
-        const rover = document.getElementById('rover-view');
-        
-        panel.style.display = 'block';
+        const status = document.getElementById('status');
+        const rover = document.getElementById('rover');
         
         const hasImport = code.includes('import turtle');
         const hasObject = code.includes('rover = turtle.Turtle()');
 
         if (hasImport && hasObject) {
-            msg.innerHTML = "<span class='success'>✅ СИСТЕМЫ ОНЛАЙН!</span><br>Библиотека загружена. Объект 'rover' создан и готов к работе.";
+            status.innerHTML = "<span style='color:var(--success)'>✅ СИСТЕМЫ ПОДКЛЮЧЕНЫ!<br>Ровер 'Pioneer-1' онлайн. Связь установлена.</span>";
             rover.style.display = 'block';
         } else if (hasImport && !hasObject) {
-            msg.innerHTML = "⚠️ БИБЛИОТЕКА ЗАГРУЖЕНА, но ровер не создан.<br>Добавь строку: <b>rover = turtle.Turtle()</b>";
+            status.innerHTML = "<span style='color:var(--error)'>⚠️ БИБЛИОТЕКА ЗАГРУЖЕНА...<br>Но ровер не создан. Добавь команду: rover = turtle.Turtle()</span>";
             rover.style.display = 'none';
         } else {
-            msg.innerHTML = "❌ ОШИБКА: Команды запуска не распознаны.<br>Начни с <b>import turtle</b>";
+            status.innerHTML = "<span style='color:var(--error)'>❌ ОШИБКА ДОСТУПА.<br>Начни с команды: import turtle</span>";
             rover.style.display = 'none';
         }
     }
