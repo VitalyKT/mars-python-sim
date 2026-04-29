@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+    <style>
+        :root { --neon: #66fcf1; --mars: #ff4d00; --bg: #0b0c10; --card: #1f2833; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 15px; display: flex; flex-direction: column; height: 95vh; overflow: hidden; }
+        
+        .mission-box { background: rgba(255, 77, 0, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid var(--mars); margin-bottom: 15px; font-size: 14px; line-height: 1.4; }
+        
+        #lab { display: flex; gap: 15px; flex-grow: 1; min-height: 0; }
+        #editor-side, #canvas-side { flex: 1; display: flex; flex-direction: column; }
+        textarea { background: #000; color: var(--neon); border: 1px solid #444; padding: 15px; font-size: 15px; flex-grow: 1; resize: none; outline: none; border-radius: 5px; }
+        #mycanvas { background: #1a0f0a; border: 2px solid #bf360c; border-radius: 10px; flex-grow: 1; }
+        .run-btn { background: var(--mars); color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; text-transform: uppercase; }
+        #log { font-size: 13px; color: #888; margin-top: 5px; height: 20px; text-align: center; }
+        
+        .hint-box { display: flex; justify-content: space-around; margin-bottom: 10px; }
+        .hint { background: var(--card); padding: 5px 10px; border-radius: 4px; border: 1px solid var(--neon); font-size: 12px; color: var(--neon); }
+    </style>
+</head>
+<body>
+
+    <h2 style="color: var(--neon); text-align: center; margin: 0 0 10px 0;">🚀 ПОЛЕТНЫЙ ПОЛИГОН: РЕЖИМ ПЕРЕЛЕТА</h2>
+
+    <div class="hint-box">
+        <div class="hint">penup() - ПОДНЯТЬ</div>
+        <div class="hint">pendown() - ОПУСТИТЬ</div>
+    </div>
+
+    <div class="mission-box">
+        <strong>ЗАДАНИЕ:</strong> Нарисуй две параллельные линии длиной 100, между которыми будет пустое пространство в 50 шагов. <br>
+        <i>(Алгоритм: Ехать -> Поднять -> Ехать -> Опустить -> Ехать)</i>
+    </div>
+
+    <div id="lab">
+        <div id="editor-side">
+            <textarea id="yourcode" spellcheck="false">import turtle
+rover = turtle.Turtle()
+rover.color("orange")
+rover.pensize(5)
+
+# 1. Первая линия
+rover.forward(100)
+
+# 2. ПРЫЖОК (напиши команды тут)
+
+
+# 3. Вторая линия
+rover.forward(100)</textarea>
+            <button class="run-btn" onclick="runit()">ВЫПОЛНИТЬ МАНЕВР ▶️</button>
+        </div>
+        <div id="canvas-side">
+            <div id="mycanvas"></div>
+            <div id="log"></div>
+        </div>
+    </div>
+
+<script>
+    function outf(text) { console.log(text); }
+    function builtinRead(x) { return Sk.builtinFiles["files"][x]; }
+    
+    function runit() {
+        const prog = document.getElementById("yourcode").value;
+        const log = document.getElementById("log");
+        document.getElementById("mycanvas").innerHTML = '';
+        log.innerText = "📡 СИГНАЛ ПЕРЕДАН...";
+        log.style.color = "#888";
+
+        Sk.configure({output:outf, read:builtinRead});
+        (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
+        
+        Sk.misceval.asyncToPromise(() => {
+            return Sk.importMainWithBody("<stdin>", false, prog, true);
+        }).then(() => {
+            const code = document.getElementById("yourcode").value;
+            if (code.includes('penup()') && code.includes('pendown()')) {
+                log.innerText = "✅ ИДЕАЛЬНО! Маневр выполнен без ошибок.";
+                log.style.color = "#2ecc71";
+            } else {
+                log.innerText = "⚠️ Ровер проехал, но линии не прервались. Используй penup()!";
+                log.style.color = "#f1fa8c";
+            }
+        }).catch(err => {
+            log.innerText = "❌ ОШИБКА: " + err.toString();
+            log.style.color = "#ff4d00";
+        });
+    }
+</script>
+</body>
+</html>
