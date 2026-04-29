@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+    <style>
+        :root { --neon: #66fcf1; --mars: #ff4d00; --bg: #0b0c10; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 10px; display: flex; flex-direction: column; height: 95vh; }
+        #controls { display: flex; gap: 10px; flex-grow: 1; min-height: 0; }
+        #editor-side, #canvas-side { flex: 1; display: flex; flex-direction: column; }
+        textarea { background: #000; color: var(--neon); border: 1px solid #444; padding: 15px; font-size: 16px; flex-grow: 1; resize: none; outline: none; border-radius: 5px; }
+        #mycanvas { background: #1a0f0a; border: 2px solid #bf360c; border-radius: 10px; flex-grow: 1; overflow: hidden; }
+        .run-btn { background: var(--mars); color: #fff; border: none; padding: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; }
+        #log { font-size: 12px; color: #888; height: 20px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div id="controls">
+        <div id="editor-side">
+            <textarea id="yourcode" spellcheck="false">import turtle
+rover = turtle.Turtle()
+rover.color("cyan")
+
+# ПИШИ КОМАНДЫ НИЖЕ:
+</textarea>
+            <button class="run-btn" onclick="runit()">ПЕРЕДАТЬ КОМАНДЫ ▶️</button>
+        </div>
+        <div id="canvas-side">
+            <div id="mycanvas"></div>
+            <div id="log"></div>
+        </div>
+    </div>
+
+<script>
+    function outf(text) { document.getElementById("log").innerText = text; }
+    function builtinRead(x) { return Sk.builtinFiles["files"][x]; }
+    
+    function runit() {
+        const prog = document.getElementById("yourcode").value;
+        const log = document.getElementById("log");
+        document.getElementById("mycanvas").innerHTML = '';
+        log.innerText = "🛰️ СИГНАЛ ОТПРАВЛЕН...";
+
+        Sk.configure({output:outf, read:builtinRead});
+        (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
+        
+        Sk.misceval.asyncToPromise(() => {
+            return Sk.importMainWithBody("<stdin>", false, prog, true);
+        }).catch(err => {
+            log.innerText = "❌ ОШИБКА: " + err.toString();
+            log.style.color = "#ff4d00";
+        });
+    }
+</script>
+</body>
+</html>
