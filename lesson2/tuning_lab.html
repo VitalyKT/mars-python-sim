@@ -6,21 +6,24 @@
     <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
     <style>
         :root { --neon: #66fcf1; --mars: #ff4d00; --bg: #0b0c10; --card: #1f2833; }
-        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 15px; display: flex; flex-direction: column; height: 95vh; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 15px; display: flex; flex-direction: column; height: 95vh; overflow: hidden; }
         
-        /* Сетка шпаргалок */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        /* Сетка шпаргалок (карточки сверху) */
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
         .card { background: var(--card); border: 1px solid var(--mars); border-radius: 8px; padding: 10px; text-align: center; font-size: 12px; }
         .preview { height: 35px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; background: #000; border-radius: 4px; }
         .card-title { color: var(--neon); font-weight: bold; margin-bottom: 5px; text-transform: uppercase; font-size: 11px; }
         code { color: #f1fa8c; font-size: 11px; }
 
-        /* Лаборатория (Редактор + Канвас) */
+        /* Инструкция */
+        .mission-box { background: rgba(102, 252, 241, 0.05); padding: 12px; border-radius: 8px; border-left: 4px solid var(--mars); margin-bottom: 15px; font-size: 13px; color: #ccc; }
+
+        /* Лаборатория (Редактор + Поле) */
         #lab { display: flex; gap: 15px; flex-grow: 1; min-height: 0; }
         #editor-side, #canvas-side { flex: 1; display: flex; flex-direction: column; }
         textarea { background: #000; color: var(--neon); border: 1px solid #444; padding: 15px; font-size: 15px; flex-grow: 1; resize: none; outline: none; border-radius: 5px; }
         #mycanvas { background: #1a0f0a; border: 2px solid #bf360c; border-radius: 10px; flex-grow: 1; }
-        .run-btn { background: var(--mars); color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; }
+        .run-btn { background: var(--mars); color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; text-transform: uppercase; }
         #log { font-size: 12px; color: #888; margin-top: 5px; height: 15px; }
     </style>
 </head>
@@ -39,30 +42,35 @@
         </div>
         <div class="card">
             <div class="card-title">Форма</div>
-            <div class="preview">🐢</div>
+            <div class="preview" style="font-size: 20px;">🐢</div>
             <code>shape("turtle")</code>
         </div>
         <div class="card">
-            <div class="card-title">Прыжок</div>
-            <div class="preview" style="color:var(--mars)">__ __</div>
-            <code>penup()</code>
+            <div class="card-title">Скорость</div>
+            <div class="preview" style="color:var(--mars); font-size: 18px;">⚡⚡</div>
+            <code>speed(0)</code>
         </div>
-        <div class="card">
-            <div class="card-title">Рисовать</div>
-            <div class="preview" style="color:var(--neon)">____</div>
-            <code>pendown()</code>
-        </div>
+    </div>
+
+    <div class="mission-box">
+        <strong>ЗАДАНИЕ:</strong> Настрой ровер по протоколу ЦУП!<br>
+        1. Форма: <b>"turtle"</b> | 2. Толщина линии: <b>10</b> | 3. Скорость: <b>0</b> (мгновенно)
     </div>
 
     <div id="lab">
         <div id="editor-side">
             <textarea id="yourcode" spellcheck="false">import turtle
 rover = turtle.Turtle()
-rover.speed(5)
 
-# Настрой ровер (цвет, размер, форма)
-# И нарисуй прерывистую линию!</textarea>
-            <button class="run-btn" onclick="runit()">ЗАПУСТИТЬ ИНЖЕНЕРНЫЙ ТЕСТ ▶️</button>
+# === ТВОЙ ТЮНИНГ ЗДЕСЬ ===
+# 1. Смени форму (shape)
+# 2. Выбери яркий цвет (color)
+# 3. Установи толщину 10 (pensize)
+# 4. Включи скорость 0 (speed)
+# ========================
+
+rover.forward(100)</textarea>
+            <button class="run-btn" onclick="runit()">ПРИМЕНИТЬ НАСТРОЙКИ ▶️</button>
         </div>
         <div id="canvas-side">
             <div id="mycanvas"></div>
@@ -78,13 +86,15 @@ rover.speed(5)
         const prog = document.getElementById("yourcode").value;
         const log = document.getElementById("log");
         document.getElementById("mycanvas").innerHTML = '';
-        log.innerText = "🛠️ ПРИМЕНЕНИЕ НАСТРОЕК...";
+        log.innerText = "🛠️ ИНЖЕНЕРНЫЙ ТЕСТ ЗАПУЩЕН...";
 
         Sk.configure({output:outf, read:builtinRead});
         (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
         
         Sk.misceval.asyncToPromise(() => {
             return Sk.importMainWithBody("<stdin>", false, prog, true);
+        }).then(() => {
+            log.innerText = "✅ СИСТЕМЫ СТАБИЛЬНЫ";
         }).catch(err => {
             log.innerText = "❌ ОШИБКА: " + err.toString();
         });
