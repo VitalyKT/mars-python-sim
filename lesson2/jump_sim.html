@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+    <style>
+        body { background: #0b0c10; color: #fff; font-family: 'Courier New', monospace; padding: 15px; margin: 0; }
+        #main { display: flex; gap: 10px; height: 380px; }
+        #editor { flex: 1; display: flex; flex-direction: column; }
+        textarea { flex: 1; background: #000; color: #66fcf1; border: 1px solid #444; padding: 10px; outline: none; font-size: 14px; }
+        #mycanvas { flex: 1; background: #1a1a1a; border: 2px solid #ff4d00; border-radius: 10px; }
+        .btn { background: #ff4d00; color: #fff; border: none; padding: 12px; cursor: pointer; width: 100%; margin-top: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h3 style="margin:0 0 10px 0; color:#66fcf1; text-align:center;">🔌 ТРЕНАЖЕР: ПРЕРЫВИСТЫЙ СЛЕД</h3>
+    <div id="main">
+        <div id="editor">
+            <textarea id="code" spellcheck="false">import turtle
+rover = turtle.Turtle()
+rover.speed(5)
+
+rover.forward(50)
+rover.penup()     # Подняли
+rover.forward(50) # Пролетели
+rover.pendown()   # Опустили
+rover.forward(50)</textarea>
+            <button class="btn" onclick="run()">ЗАПУСТИТЬ ТЕСТ ▶️</button>
+        </div>
+        <div id="mycanvas"></div>
+    </div>
+
+<script>
+    function run() {
+        const prog = document.getElementById("code").value;
+        document.getElementById("mycanvas").innerHTML = '';
+        Sk.configure({read: (x) => Sk.builtinFiles["files"][x]});
+        (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
+        Sk.misceval.asyncToPromise(() => Sk.importMainWithBody("<stdin>", false, prog, true));
+    }
+</script>
+</body>
+</html>
