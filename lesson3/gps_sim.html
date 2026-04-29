@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+    <style>
+        :root { --neon: #66fcf1; --mars: #ff4d00; --bg: #0b0c10; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 10px; display: flex; flex-direction: column; height: 95vh; }
+        #main { display: flex; gap: 10px; flex-grow: 1; }
+        textarea { flex: 1; background: #000; color: var(--neon); border: 1px solid #444; padding: 10px; font-size: 14px; outline: none; }
+        #mycanvas { flex: 1; background: #1a0f0a; border: 2px solid #333; border-radius: 10px; }
+        .run-btn { background: var(--mars); color: #fff; border: none; padding: 12px; cursor: pointer; margin-top: 5px; font-weight: bold; }
+        .mission { background: rgba(102, 252, 241, 0.05); padding: 8px; border-left: 3px solid var(--neon); font-size: 13px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="mission">
+        <b>GPS-ТЕСТ:</b> Отправь ровер в точки:<br>
+        1. (100, 100) | 2. (-100, 100) | 3. (0, 0)
+    </div>
+    <div id="main">
+        <textarea id="code">import turtle
+rover = turtle.Turtle()
+rover.shape("turtle")
+rover.color("cyan")
+
+# Напиши команды goto здесь:
+</textarea>
+        <div id="mycanvas"></div>
+    </div>
+    <button class="run-btn" onclick="run()">ЗАПУСТИТЬ НАВИГАЦИЮ ▶️</button>
+
+<script>
+    function run() {
+        const prog = document.getElementById("code").value;
+        document.getElementById("mycanvas").innerHTML = '';
+        Sk.configure({read: (x) => Sk.builtinFiles["files"][x]});
+        (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
+        Sk.misceval.asyncToPromise(() => Sk.importMainWithBody("<stdin>", false, prog, true));
+    }
+</script>
+</body>
+</html>
