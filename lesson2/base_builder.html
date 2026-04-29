@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+    <style>
+        :root { --neon: #66fcf1; --mars: #ff4d00; --bg: #0b0c10; --card: #1f2833; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 10px; display: flex; flex-direction: column; height: 98vh; overflow: hidden; }
+        
+        #header { border-bottom: 2px solid var(--mars); padding: 5px; margin-bottom: 10px; text-align: center; }
+        #main { display: flex; gap: 10px; flex-grow: 1; min-height: 0; }
+        
+        #editor-side { flex: 4; display: flex; flex-direction: column; }
+        #canvas-side { flex: 6; display: flex; flex-direction: column; position: relative; }
+        
+        textarea { background: #000; color: var(--neon); border: 1px solid #444; padding: 10px; font-size: 14px; flex-grow: 1; resize: none; outline: none; border-radius: 5px; line-height: 1.4; }
+        #mycanvas { background: #1a0f0a; border: 2px solid #bf360c; border-radius: 10px; flex-grow: 1; }
+        
+        .run-btn { background: var(--mars); color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; text-transform: uppercase; }
+        #status-bar { background: #000; padding: 8px; font-size: 13px; color: #888; border-top: 1px solid #333; margin-top: 5px; text-align: center; }
+        
+        .mission-text { font-size: 12px; color: #ccc; margin-bottom: 10px; padding: 8px; border: 1px dashed #555; }
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <h3 style="margin:0; color: var(--neon);">🏗️ СТРОИТЕЛЬСТВО БАЗЫ "АЛЬФА"</h3>
+    </div>
+
+    <div id="main">
+        <div id="editor-side">
+            <div class="mission-text">
+                <b>ПЛАН:</b><br>
+                1. Тюнинг: turtle, pensize(5)<br>
+                2. Оранжевый квадрат<br>
+                3. Прыжок (penup/pendown)<br>
+                4. Синий квадрат
+            </div>
+            <textarea id="yourcode" spellcheck="false">import turtle
+rover = turtle.Turtle()
+rover.speed(0)
+rover.shape("turtle")
+rover.pensize(5)
+
+# СТРОЙ ЗДЕСЬ:
+</textarea>
+            <button class="run-btn" onclick="runit()">ЗАПУСТИТЬ СТРОИТЕЛЬСТВО ▶️</button>
+        </div>
+        <div id="canvas-side">
+            <div id="mycanvas"></div>
+            <div id="status-bar">ЦУП: Ожидание полетного листа...</div>
+        </div>
+    </div>
+
+<script>
+    function outf(text) { console.log(text); }
+    function builtinRead(x) { return Sk.builtinFiles["files"][x]; }
+    
+    function runit() {
+        const prog = document.getElementById("yourcode").value;
+        const status = document.getElementById("status-bar");
+        document.getElementById("mycanvas").innerHTML = '';
+        status.innerText = "📡 СТРОИТЕЛЬНЫЕ ДРОНЫ ЗАПУЩЕНЫ...";
+        status.style.color = "#888";
+
+        Sk.configure({output:outf, read:builtinRead});
+        (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
+        
+        Sk.misceval.asyncToPromise(() => {
+            return Sk.importMainWithBody("<stdin>", false, prog, true);
+        }).then(() => {
+            const code = document.getElementById("yourcode").value;
+            const hasColors = code.includes('orange') && (code.includes('blue') || code.includes('cyan'));
+            const hasJump = code.includes('penup') && code.includes('pendown');
+            
+            if (hasColors && hasJump) {
+                status.innerText = "✅ БАЗА ПОСТРОЕНА! Модули герметичны. Модуль 2 пройден!";
+                status.style.color = "#2ecc71";
+            } else if (!hasJump) {
+                status.innerText = "⚠️ Модули слиплись! Используй penup(), чтобы разнести их.";
+                status.style.color = "#f1fa8c";
+            } else {
+                status.innerText = "⚠️ Используй разные цвета для модулей (orange и blue).";
+                status.style.color = "#f1fa8c";
+            }
+        }).catch(err => {
+            status.innerText = "❌ КРИТИЧЕСКАЯ ОШИБКА: " + err.toString();
+            status.style.color = "#ff4d00";
+        });
+    }
+</script>
+</body>
+</html>
