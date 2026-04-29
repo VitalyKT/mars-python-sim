@@ -8,49 +8,52 @@
         :root { --neon: #66fcf1; --mars: #ff4d00; --bg: #0b0c10; --card: #1f2833; }
         body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 15px; display: flex; flex-direction: column; height: 95vh; overflow: hidden; }
         
-        .mission-box { background: rgba(255, 77, 0, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid var(--mars); margin-bottom: 15px; font-size: 14px; line-height: 1.4; }
+        .mission-box { background: rgba(255, 77, 0, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid var(--mars); margin-bottom: 15px; font-size: 14px; }
         
         #lab { display: flex; gap: 15px; flex-grow: 1; min-height: 0; }
         #editor-side, #canvas-side { flex: 1; display: flex; flex-direction: column; }
-        textarea { background: #000; color: var(--neon); border: 1px solid #444; padding: 15px; font-size: 15px; flex-grow: 1; resize: none; outline: none; border-radius: 5px; }
+        textarea { background: #000; color: var(--neon); border: 1px solid #444; padding: 15px; font-size: 14px; flex-grow: 1; resize: none; outline: none; border-radius: 5px; line-height: 1.5; }
         #mycanvas { background: #1a0f0a; border: 2px solid #bf360c; border-radius: 10px; flex-grow: 1; }
         .run-btn { background: var(--mars); color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; text-transform: uppercase; }
         #log { font-size: 13px; color: #888; margin-top: 5px; height: 20px; text-align: center; }
         
-        .hint-box { display: flex; justify-content: space-around; margin-bottom: 10px; }
-        .hint { background: var(--card); padding: 5px 10px; border-radius: 4px; border: 1px solid var(--neon); font-size: 12px; color: var(--neon); }
+        .hint-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 12px; }
+        .hint-tag { color: var(--neon); border: 1px solid var(--neon); padding: 2px 8px; border-radius: 4px; }
     </style>
 </head>
 <body>
 
-    <h2 style="color: var(--neon); text-align: center; margin: 0 0 10px 0;">🚀 ПОЛЕТНЫЙ ПОЛИГОН: РЕЖИМ ПЕРЕЛЕТА</h2>
-
-    <div class="hint-box">
-        <div class="hint">penup() - ПОДНЯТЬ</div>
-        <div class="hint">pendown() - ОПУСТИТЬ</div>
-    </div>
+    <h2 style="color: var(--neon); text-align: center; margin: 0 0 10px 0;">📡 МИССИЯ: ПУНКТИРНАЯ ЛИНИЯ</h2>
 
     <div class="mission-box">
-        <strong>ЗАДАНИЕ:</strong> Нарисуй две параллельные линии длиной 100, между которыми будет пустое пространство в 50 шагов. <br>
-        <i>(Алгоритм: Ехать -> Поднять -> Ехать -> Опустить -> Ехать)</i>
+        <strong>ЗАДАНИЕ:</strong> Нарисуй пунктирную линию из 3-х отрезков. <br>
+        Проедь 40 шагов с опущенным пером, 40 — с поднятым, и повтори это. <br>
+        <i>Твой код должен выглядеть как ритм: вниз-вперед, вверх-вперед...</i>
     </div>
 
     <div id="lab">
         <div id="editor-side">
+            <div class="hint-row">
+                <span class="hint-tag">pendown() - рисуем</span>
+                <span class="hint-tag">penup() - летим</span>
+            </div>
             <textarea id="yourcode" spellcheck="false">import turtle
 rover = turtle.Turtle()
-rover.color("orange")
 rover.pensize(5)
+rover.color("gold")
 
-# 1. Первая линия
-rover.forward(100)
+# 1. Первый штрих
+rover.pendown()
+rover.forward(40)
 
-# 2. ПРЫЖОК (напиши команды тут)
+# 2. Пропуск (подними перо и проедь 40)
 
 
-# 3. Вторая линия
-rover.forward(100)</textarea>
-            <button class="run-btn" onclick="runit()">ВЫПОЛНИТЬ МАНЕВР ▶️</button>
+# 3. Второй штрих (опусти перо и проедь 40)
+
+
+# 4. Снова пропуск...</textarea>
+            <button class="run-btn" onclick="runit()">ЗАПУСТИТЬ КОНВЕЙЕР ▶️</button>
         </div>
         <div id="canvas-side">
             <div id="mycanvas"></div>
@@ -66,8 +69,7 @@ rover.forward(100)</textarea>
         const prog = document.getElementById("yourcode").value;
         const log = document.getElementById("log");
         document.getElementById("mycanvas").innerHTML = '';
-        log.innerText = "📡 СИГНАЛ ПЕРЕДАН...";
-        log.style.color = "#888";
+        log.innerText = "📡 ПЕРЕДАЧА ПРОТОКОЛА...";
 
         Sk.configure({output:outf, read:builtinRead});
         (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
@@ -76,11 +78,14 @@ rover.forward(100)</textarea>
             return Sk.importMainWithBody("<stdin>", false, prog, true);
         }).then(() => {
             const code = document.getElementById("yourcode").value;
-            if (code.includes('penup()') && code.includes('pendown()')) {
-                log.innerText = "✅ ИДЕАЛЬНО! Маневр выполнен без ошибок.";
+            const upCount = (code.match(/penup/g) || []).length;
+            const downCount = (code.match(/pendown/g) || []).length;
+            
+            if (upCount >= 2 && downCount >= 2) {
+                log.innerText = "✅ ПУНКТИР ПОЛУЧЕН! Отличная работа, Навигатор.";
                 log.style.color = "#2ecc71";
             } else {
-                log.innerText = "⚠️ Ровер проехал, но линии не прервались. Используй penup()!";
+                log.innerText = "⚠️ Попробуй сделать больше переключений penup/pendown!";
                 log.style.color = "#f1fa8c";
             }
         }).catch(err => {
