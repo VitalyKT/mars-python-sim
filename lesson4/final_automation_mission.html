@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+    <style>
+        :root { --neon: #66fcf1; --mars: #ff4d00; --bg: #0b0c10; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 10px; display: flex; flex-direction: column; height: 98vh; overflow: hidden; }
+        #main { display: flex; gap: 10px; flex-grow: 1; min-height: 0; }
+        #editor-side, #canvas-side { flex: 1; display: flex; flex-direction: column; }
+        textarea { background: #000; color: var(--neon); border: 1px solid #444; padding: 15px; font-size: 14px; flex-grow: 1; resize: none; outline: none; border-radius: 5px; line-height: 1.5; }
+        #mycanvas { background: #1a0f0a; border: 2px solid #bf360c; border-radius: 10px; flex-grow: 1; }
+        .run-btn { background: var(--mars); color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; text-transform: uppercase; }
+        #status { font-size: 13px; color: #888; margin-top: 5px; text-align: center; height: 20px; }
+        .mission-box { background: rgba(102, 252, 241, 0.05); padding: 10px; border-radius: 5px; border-left: 4px solid var(--neon); margin-bottom: 10px; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+    <h2 style="color: var(--neon); text-align: center; margin: 0 0 10px 0;">💠 ЭКЗАМЕН: ИНЖЕНЕР-ПРОГРАММИСТ</h2>
+
+    <div id="main">
+        <div id="editor-side">
+            <div class="mission-box">
+                <b>ЗАДАНИЕ:</b> Построй шестиугольный купол базы.<br>
+                1. С нуля создай ровер и настрой его (цвет gold).<br>
+                2. Используй цикл <b>for</b>, чтобы повторить 6 раз:<br>
+                &nbsp;&nbsp;&nbsp; - вперед на 100<br>
+                &nbsp;&nbsp;&nbsp; - поворот на 60 градусов
+            </div>
+            <textarea id="yourcode" spellcheck="false"># Напиши программу автоматической постройки шестиугольника:
+
+</textarea>
+            <button class="run-btn" onclick="runit()">ЗАПУСТИТЬ АЛГОРИТМ ▶️</button>
+        </div>
+        <div id="canvas-side">
+            <div id="mycanvas"></div>
+            <div id="status"></div>
+        </div>
+    </div>
+
+<script>
+    function outf(text) { console.log(text); }
+    function builtinRead(x) { return Sk.builtinFiles["files"][x]; }
+    
+    function runit() {
+        const prog = document.getElementById("yourcode").value;
+        const status = document.getElementById("status");
+        document.getElementById("mycanvas").innerHTML = '';
+        status.innerText = "💠 ПРОВЕРКА ЦИКЛИЧЕСКОГО КОДА...";
+
+        Sk.configure({output:outf, read:builtinRead});
+        (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
+        
+        Sk.misceval.asyncToPromise(() => {
+            return Sk.importMainWithBody("<stdin>", false, prog, true);
+        }).then(() => {
+            const hasLoop = prog.includes('for ') && (prog.includes('6') || prog.includes('range(6)'));
+            const hasTurtle = prog.includes('import turtle');
+            
+            if (hasLoop && hasTurtle) {
+                status.innerText = "✅ ВЕЛИКОЛЕПНО! База построена по всем канонам архитектуры.";
+                status.style.color = "#2ecc71";
+            } else {
+                status.innerText = "⚠️ Проверь, использовал ли ты цикл for на 6 повторений.";
+                status.style.color = "#f1fa8c";
+            }
+        }).catch(err => {
+            status.innerText = "❌ ОШИБКА: " + err.toString();
+            status.style.color = "#ff4d00";
+        });
+    }
+</script>
+</body>
+</html>
