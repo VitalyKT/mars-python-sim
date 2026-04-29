@@ -1,1 +1,39 @@
-
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        :root { --neon: #66fcf1; --mars: #ff4d00; --bg: #0b0c10; --card: #1f2833; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; padding: 15px; margin: 0; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        .card { background: var(--card); border: 1px solid var(--mars); border-radius: 10px; padding: 15px; text-align: center; }
+        .preview { height: 40px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; border: 1px solid #333; background: #000; }
+        .title { color: var(--neon); font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+        code { color: #f1fa8c; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="grid">
+        <div class="card">
+            <div class="title">ЦВЕТ</div>
+            <div class="preview"><div style="width:20px; height:20px; background:lime; border-radius:50%;"></div></div>
+            <code>color("lime")</code>
+        </div>
+        <div class="card">
+            <div class="title">ТОЛЩИНА</div>
+            <div class="preview"><div style="width:80%; height:8px; background:var(--neon);"></div></div>
+            <code>pensize(10)</code>
+        </div>
+        <div class="card">
+            <div class="title">ФОРМА</div>
+            <div class="preview"><span style="font-size:24px;">🐢</span></div>
+            <code>shape("turtle")</code>
+        </div>
+        <div class="card">
+            <div class="title">СКОРОСТЬ</div>
+            <div class="preview">⚡⚡⚡</div>
+            <code>speed(0)</code>
+        </div>
+    </div>
+</body>
+</html>
