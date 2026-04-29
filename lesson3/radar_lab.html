@@ -14,7 +14,6 @@
         #mycanvas { background: #1a0f0a; border: 2px solid #333; border-radius: 10px; flex-grow: 1; }
         .run-btn { background: var(--mars); color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; text-transform: uppercase; }
         
-        /* Экран радиосвязи */
         #radio-display { background: #000; border: 2px solid #2ecc71; border-radius: 5px; margin-top: 10px; padding: 10px; height: 100px; overflow-y: auto; }
         .radio-header { font-size: 10px; color: #2ecc71; border-bottom: 1px solid #1a5a35; margin-bottom: 5px; }
         .signal { color: #2ecc71; font-size: 14px; margin-bottom: 3px; }
@@ -25,16 +24,17 @@
     <h2 style="color: var(--neon); text-align: center; margin: 0 0 10px 0;">📡 СЕАНС РАДИОСВЯЗИ</h2>
 
     <div class="mission-box">
-        <strong>ЗАДАНИЕ:</strong> Ровер проедет сложный маршрут. Узнай его финальные координаты! <br>
+        <strong>ЗАДАНИЕ:</strong> Ровер проедет по маршруту. Узнай его координаты! <br>
         Используй <b>радиопередатчик</b>, чтобы вывести данные на экран:<br>
-        <code>print(rover.xcor())</code><br>
-        <code>print(rover.ycor())</code>
+        <code>print(rover.xcor())</code> и <code>print(rover.ycor())</code>
     </div>
 
     <div id="lab">
         <div id="editor-side">
             <textarea id="yourcode" spellcheck="false">import turtle
 rover = turtle.Turtle()
+rover.color("#66fcf1") # Установили яркий цвет линии
+rover.pensize(3)       # Сделали линию чуть заметнее
 rover.speed(5)
 
 # Маршрут ровера (не меняй)
@@ -71,7 +71,7 @@ rover.forward(100)
         const prog = document.getElementById("yourcode").value;
         const signals = document.getElementById("signals");
         document.getElementById("mycanvas").innerHTML = '';
-        signals.innerHTML = ""; // Очистка экрана
+        signals.innerHTML = "";
 
         Sk.configure({output:outf, read:builtinRead});
         (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
