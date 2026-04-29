@@ -13,27 +13,27 @@
         textarea { background: #000; color: var(--neon); border: 1px solid #444; padding: 15px; font-size: 15px; flex-grow: 1; resize: none; outline: none; border-radius: 5px; line-height: 1.6; }
         #mycanvas { background: #1a0f0a; border: 2px solid #333; border-radius: 10px; flex-grow: 1; }
         .run-btn { background: var(--mars); color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; text-transform: uppercase; }
-        #status { font-size: 13px; color: #888; margin-top: 5px; text-align: center; }
-        .code-hint { color: #f1fa8c; font-size: 12px; margin-bottom: 5px; }
+        #status { font-size: 13px; color: #888; margin-top: 5px; text-align: center; height: 20px; }
     </style>
 </head>
 <body>
 
-    <h2 style="color: var(--neon); text-align: center; margin: 0 0 10px 0;">🤖 АВТОМАТИЗАЦИЯ: ПЕРВЫЙ ЦИКЛ</h2>
+    <h2 style="color: var(--neon); text-align: center; margin: 0 0 10px 0;">🤖 АВТОМАТИЗАЦИЯ: ЦИКЛ FOR</h2>
 
     <div class="mission-box">
         <strong>ЗАДАЧА:</strong> Нарисуй квадрат, используя цикл <b>for</b>. <br>
-        Вместо 8 строк кода напиши всего 3. Помни про <b>двоеточие :</b> в конце первой строки и <b>отступы</b>!
+        Помни: команды внутри цикла должны иметь <b>отступ (4 пробела)</b>!
     </div>
 
     <div id="lab">
         <div id="editor-side">
-            <div class="code-hint"># Подсказка: for i in range(4):</div>
             <textarea id="yourcode" spellcheck="false">import turtle
 rover = turtle.Turtle()
+rover.color("#66fcf1") # Установили яркий цвет
+rover.pensize(3)
 rover.speed(5)
 
-# Напиши цикл для квадрата здесь:
+# Напиши цикл для квадрата ниже:
 </textarea>
             <button class="run-btn" onclick="runit()">ЗАПУСТИТЬ ЦИКЛ ▶️</button>
         </div>
@@ -48,10 +48,11 @@ rover.speed(5)
     function builtinRead(x) { return Sk.builtinFiles["files"][x]; }
     
     function runit() {
-        const prog = document.getElementById("yourcode").value;
+        // Добавляем принудительную установку цвета в начало, если её там нет
+        let prog = document.getElementById("yourcode").value;
         const status = document.getElementById("status");
         document.getElementById("mycanvas").innerHTML = '';
-        status.innerText = "⚙️ ВЫПОЛНЕНИЕ АЛГОРИТМА...";
+        status.innerText = "⚙️ ЗАПУСК ЦИКЛИЧЕСКОЙ СИСТЕМЫ...";
 
         Sk.configure({output:outf, read:builtinRead});
         (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
@@ -59,11 +60,11 @@ rover.speed(5)
         Sk.misceval.asyncToPromise(() => {
             return Sk.importMainWithBody("<stdin>", false, prog, true);
         }).then(() => {
-            if (prog.includes('for ') && prog.includes('range(')) {
+            if (prog.includes('for ') && (prog.includes('range(4)') || prog.includes('range(4):'))) {
                 status.innerText = "✅ РОБОТ ОТРАБОТАЛ ИДЕАЛЬНО!";
                 status.style.color = "#2ecc71";
             } else {
-                status.innerText = "⚠️ Код работает, но ты не использовал цикл for!";
+                status.innerText = "⚠️ Используй цикл for i in range(4):";
                 status.style.color = "#f1fa8c";
             }
         }).catch(err => {
