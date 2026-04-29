@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Turtle Space Cheat Sheet</title>
+    <style>
+        :root {
+            --neon-cyan: #66fcf1;
+            --mars-red: #ff4d00;
+            --bg: #0b0c10;
+            --panel: #1f2833;
+            --text: #fff;
+            --code-key: #f1fa8c; /* Желтый для команд */
+            --code-obj: #8be9fd; /* Голубой для объектов */
+            --code-arg: #ff79c6; /* Розовый для чисел */
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 900px;
+            border: 2px solid var(--mars-red);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(255, 77, 0, 0.2);
+            background: rgba(31, 40, 51, 0.5);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 24px;
+            margin-top: 0;
+            border-bottom: 2px solid var(--neon-cyan);
+            padding-bottom: 10px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border-left: 4px solid var(--neon-cyan);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--neon-cyan);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .term {
+            color: var(--mars-red);
+            font-weight: bold;
+        }
+
+        .desc {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            color: #ccc;
+        }
+
+        .code-block {
+            background: #000;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            font-size: 14px;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .comment { color: #6272a4; font-style: italic; }
+        .keyword { color: var(--code-obj); } /* import */
+        .object { color: #fff; } /* rover */
+        .method { color: var(--code-key); } /* forward */
+        .arg { color: var(--code-arg); } /* 100 */
+
+        /* Сетка для основных команд */
+        .commands-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .cmd-card {
+            background: var(--panel);
+            border: 1px solid #45a29e;
+            border-radius: 5px;
+            padding: 15px;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .cmd-card:hover {
+            box-shadow: 0 0 10px var(--neon-cyan);
+            transform: translateY(-2px);
+        }
+
+        .cmd-code {
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .cmd-desc {
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        /* Визуальные иконки для команд */
+        .icon-move { position: absolute; top: 10px; right: 10px; font-size: 20px; opacity: 0.5; }
+
+        .summary {
+            background: rgba(102, 252, 241, 0.1);
+            border: 2px dashed var(--neon-cyan);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <h1>🚀 ШПАРГАЛКА НАВИГАТОРА: ОСНОВЫ TURTLE 📡</h1>
+
+    <div class="section">
+        <div class="section-title">🛠️ 1. Что такое Библиотеки (Модули)</div>
+        <div class="desc">
+            В базовом наборе Python умеет не так много. Всё остальное хранится на «складе».<br>
+            <span class="term">Библиотека (Library)</span> — это набор готового кода, который написали другие программисты, чтобы мы не изобретали марсоход с нуля.
+        </div>
+        <div class="code-block">
+            <span class="keyword">import</span> turtle  <span class="comment"># Вызываем модуль "turtle" со склада в программу</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">🤖 2. Создание Объекта</div>
+        <div class="desc">
+            Нужно выкатить ровер на поверхность.<br>
+            <span class="term">Объект (Object)</span> — это конкретный экземпляр чего-либо. Библиотека — это чертеж, а <span class="object">rover</span> — твой личный аппарат.
+        </div>
+        <div class="code-block">
+            <span class="object">rover</span> = turtle.<span class="method">Turtle</span>() <span class="comment"># Создаем объект-ровер</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">🎮 3. Методы и Аргументы</div>
+        <div class="desc">
+            <span class="term">Метод (Method)</span> — действие, которое умеет выполнять объект (пишется через точку).<br>
+            <span class="term">Аргумент (Argument)</span> — уточнение для команды внутри скобок (насколько далеко? какой угол?).
+        </div>
+        <div class="code-block">
+            <span class="object">имя_объекта</span>.<span class="method">метод</span>(<span class="arg">аргумент</span>)
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">🗺️ 4. Основные команды навигатора</div>
+        <div class="commands-grid">
+            <div class="cmd-card">
+                <span class="icon-move">⬆️</span>
+                <code class="cmd-code"><span class="object">rover</span>.<span class="method">forward</span>(<span class="arg">100</span>)</code>
+                <div class="cmd-desc">Ехать <b>вперед</b> на 100 пикселей (космических метров).</div>
+            </div>
+            <div class="cmd-card">
+                <span class="icon-move">⬇️</span>
+                <code class="cmd-code"><span class="object">rover</span>.<span class="method">backward</span>(<span class="arg">50</span>)</code>
+                <div class="cmd-desc">Ехать <b>назад</b> на 50 пикселей.</div>
+            </div>
+            <div class="cmd-card">
+                <span class="icon-move">↩️</span>
+                <code class="cmd-code"><span class="object">rover</span>.<span class="method">left</span>(<span class="arg">90</span>)</code>
+                <div class="cmd-desc">Повернуть <b>влево</b> на 90 градусов.</div>
+            </div>
+            <div class="cmd-card">
+                <span class="icon-move">↪️</span>
+                <code class="cmd-code"><span class="object">rover</span>.<span class="method">right</span>(<span class="arg">45</span>)</code>
+                <div class="cmd-desc">Повернуть <b>вправо</b> на 45 градусов.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section summary">
+        <div class="section-title" style="color:#fff">📝 Подведем итог</div>
+        <div class="desc" style="color:#fff">Протокол для старта движения (вперед на 100):</div>
+        <div class="code-block" style="border: 1px solid var(--neon-cyan)">
+            <span class="keyword">import</span> turtle          <span class="comment"># 1. Загружаем модуль</span><br>
+            <span class="object">rover</span> = turtle.<span class="method">Turtle</span>() <span class="comment"># 2. Создаем объект-ровер</span><br>
+            <span class="object">rover</span>.<span class="method">forward</span>(<span class="arg">100</span>)      <span class="comment"># 3. Вызываем метод движения</span>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
