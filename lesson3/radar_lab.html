@@ -13,17 +13,22 @@
         textarea { background: #000; color: var(--neon); border: 1px solid #444; padding: 15px; font-size: 15px; flex-grow: 1; resize: none; outline: none; border-radius: 5px; }
         #mycanvas { background: #1a0f0a; border: 2px solid #333; border-radius: 10px; flex-grow: 1; }
         .run-btn { background: var(--mars); color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; text-transform: uppercase; }
-        #console { background: #000; color: #2ecc71; padding: 10px; font-size: 14px; border: 1px solid #222; margin-top: 5px; min-height: 40px; border-radius: 5px; }
+        
+        /* Экран радиосвязи */
+        #radio-display { background: #000; border: 2px solid #2ecc71; border-radius: 5px; margin-top: 10px; padding: 10px; height: 100px; overflow-y: auto; }
+        .radio-header { font-size: 10px; color: #2ecc71; border-bottom: 1px solid #1a5a35; margin-bottom: 5px; }
+        .signal { color: #2ecc71; font-size: 14px; margin-bottom: 3px; }
     </style>
 </head>
 <body>
 
-    <h2 style="color: var(--neon); text-align: center; margin: 0 0 10px 0;">📡 ТЕЛЕМЕТРИЯ: СКАНЕР ПОЗИЦИИ</h2>
+    <h2 style="color: var(--neon); text-align: center; margin: 0 0 10px 0;">📡 СЕАНС РАДИОСВЯЗИ</h2>
 
     <div class="mission-box">
-        <strong>ЗАДАНИЕ:</strong> Ровер проедет по маршруту. Тебе нужно узнать его итоговые координаты. <br>
-        Добавь в конце кода команды: <br>
-        <code>print(rover.xcor())</code> и <code>print(rover.ycor())</code>
+        <strong>ЗАДАНИЕ:</strong> Ровер проедет сложный маршрут. Узнай его финальные координаты! <br>
+        Используй <b>радиопередатчик</b>, чтобы вывести данные на экран:<br>
+        <code>print(rover.xcor())</code><br>
+        <code>print(rover.ycor())</code>
     </div>
 
     <div id="lab">
@@ -32,15 +37,19 @@
 rover = turtle.Turtle()
 rover.speed(5)
 
-# Маршрут ровера
-rover.forward(125)
+# Маршрут ровера (не меняй)
+rover.forward(150)
 rover.left(90)
-rover.forward(80)
+rover.forward(100)
 
-# Узнай, где он находится!
+# === ТВОЙ КОД ЗДЕСЬ ===
+# Передай координаты по радиосвязи!
 </textarea>
-            <button class="run-btn" onclick="runit()">ЗАПРОСИТЬ ТЕЛЕМЕТРИЮ ▶️</button>
-            <div id="console">ЦУП: Ожидание данных...</div>
+            <button class="run-btn" onclick="runit()">ВКЛЮЧИТЬ РАДИОПЕРЕДАТЧИК ▶️</button>
+            <div id="radio-display">
+                <div class="radio-header">📟 ЭКРАН ПРИЕМА СИГНАЛОВ (ЦУП):</div>
+                <div id="signals"></div>
+            </div>
         </div>
         <div id="canvas-side">
             <div id="mycanvas"></div>
@@ -49,32 +58,28 @@ rover.forward(80)
 
 <script>
     function outf(text) { 
-        const consoleDiv = document.getElementById("console");
-        if (consoleDiv.innerText.includes("Ожидание")) consoleDiv.innerText = "";
-        consoleDiv.innerText += "ОТВЕТ: " + text + "\n"; 
+        const signals = document.getElementById("signals");
+        const msg = document.createElement("div");
+        msg.className = "signal";
+        msg.innerText = "📡 СИГНАЛ: " + text;
+        signals.appendChild(msg);
+        signals.scrollTop = signals.scrollHeight;
     }
     function builtinRead(x) { return Sk.builtinFiles["files"][x]; }
     
     function runit() {
         const prog = document.getElementById("yourcode").value;
-        const consoleDiv = document.getElementById("console");
+        const signals = document.getElementById("signals");
         document.getElementById("mycanvas").innerHTML = '';
-        consoleDiv.innerText = "📡 ЗАПРОС ОТПРАВЛЕН...\n";
-        consoleDiv.style.color = "#2ecc71";
+        signals.innerHTML = ""; // Очистка экрана
 
         Sk.configure({output:outf, read:builtinRead});
         (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
         
         Sk.misceval.asyncToPromise(() => {
             return Sk.importMainWithBody("<stdin>", false, prog, true);
-        }).then(() => {
-            if (!prog.includes('xcor') || !prog.includes('ycor')) {
-                consoleDiv.innerText += "⚠️ Датчики xcor/ycor не задействованы!";
-                consoleDiv.style.color = "#f1fa8c";
-            }
         }).catch(err => {
-            consoleDiv.innerText = "❌ ОШИБКА: " + err.toString();
-            consoleDiv.style.color = "#ff4d00";
+            outf("ОШИБКА: " + err.toString());
         });
     }
 </script>
