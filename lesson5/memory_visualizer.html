@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+    <style>
+        :root { --neon: #66fcf1; --mars: #ff4d00; --bg: #0b0c10; --memory: #1f2833; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 10px; display: flex; flex-direction: column; height: 98vh; overflow: hidden; }
+        
+        #top-ui { display: flex; gap: 10px; margin-bottom: 10px; height: 120px; }
+        .info-card { flex: 1; background: rgba(102, 252, 241, 0.05); border: 1px solid var(--neon); border-radius: 8px; padding: 10px; }
+        
+        /* Визуализация памяти */
+        #memory-slots { display: flex; gap: 15px; flex-wrap: wrap; align-items: center; }
+        .mem-slot { background: var(--memory); border: 2px solid var(--neon); border-radius: 5px; padding: 5px 10px; display: flex; flex-direction: column; align-items: center; min-width: 80px; box-shadow: 0 0 10px rgba(102, 252, 241, 0.2); animation: glow 2s infinite alternate; }
+        .mem-name { font-size: 10px; color: #888; text-transform: uppercase; }
+        .mem-val { font-size: 20px; color: var(--neon); font-weight: bold; }
+        
+        #main-lab { display: flex; gap: 10px; flex-grow: 1; min-height: 0; }
+        #editor-side, #canvas-side { flex: 1; display: flex; flex-direction: column; }
+        textarea { background: #000; color: var(--neon); border: 1px solid #444; padding: 15px; font-size: 15px; flex-grow: 1; resize: none; outline: none; border-radius: 5px; line-height: 1.5; }
+        #mycanvas { background: #1a0f0a; border: 2px solid #333; border-radius: 10px; flex-grow: 1; }
+        
+        .run-btn { background: var(--mars); color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 5px; text-transform: uppercase; margin-top: 5px; }
+        
+        @keyframes glow { from { border-color: #1f2833; } to { border-color: var(--neon); } }
+    </style>
+</head>
+<body>
+
+    <div id="top-ui">
+        <div class="info-card">
+            <div style="font-size: 11px; color: var(--mars); margin-bottom: 5px;">📟 СКАНЕР ОПЕРАТИВНОЙ ПАМЯТИ (RAM):</div>
+            <div id="memory-slots">
+                <span style="color: #444; font-size: 12px;">Ячейки пусты. Определи переменную...</span>
+            </div>
+        </div>
+        <div class="info-card" style="flex: 0.5;">
+            <div style="font-size: 11px; color: var(--mars); margin-bottom: 5px;">🎯 ЦЕЛЬ:</div>
+            <div style="font-size: 13px;">Создай <b>size = 150</b>. Затем поменяй число на 30 и увидишь магию!</div>
+        </div>
+    </div>
+
+    <div id="main-lab">
+        <div id="editor-side">
+            <textarea id="yourcode" spellcheck="false" oninput="updateMemoryVisuals()">import turtle
+rover = turtle.Turtle()
+rover.color("#66fcf1")
+rover.speed(5)
+
+# 1. Создай переменную (напиши size = 100)
+size = 100
+
+# 2. Ровер использует значение из ячейки:
+for i in range(4):
+    rover.forward(size)
+    rover.left(90)</textarea>
+            <button class="run-btn" onclick="runit()">ВЫПОЛНИТЬ ПРОГРАММУ ▶️</button>
+        </div>
+        <div id="canvas-side">
+            <div id="mycanvas"></div>
+        </div>
+    </div>
+
+<script>
+    function updateMemoryVisuals() {
+        const code = document.getElementById("yourcode").value;
+        const slotsDiv = document.getElementById("memory-slots");
+        
+        // Ищем паттерны типа "имя = число"
+        const regex = /([a-zA-Z_]\w*)\s*=\s*(\d+)/g;
+        let match;
+        let html = '';
+        let found = false;
+
+        while ((match = regex.exec(code)) !== null) {
+            if (match[1] === 'i') continue; // Игнорируем счетчик цикла
+            found = true;
+            html += `<div class="mem-slot">
+                        <span class="mem-name">${match[1]}</span>
+                        <span class="mem-val">${match[2]}</span>
+                    </div>`;
+        }
+
+        if (!found) {
+            slotsDiv.innerHTML = '<span style="color: #444; font-size: 12px;">Ожидание записи данных...</span>';
+        } else {
+            slotsDiv.innerHTML = html;
+        }
+    }
+
+    // Инициализация при загрузке
+    updateMemoryVisuals();
+
+    function outf(text) { console.log(text); }
+    function builtinRead(x) { return Sk.builtinFiles["files"][x]; }
+    
+    function runit() {
+        const prog = document.getElementById("yourcode").value;
+        document.getElementById("mycanvas").innerHTML = '';
+        Sk.configure({output:outf, read:builtinRead});
+        (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
+        Sk.misceval.asyncToPromise(() => {
+            return Sk.importMainWithBody("<stdin>", false, prog, true);
+        });
+    }
+</script>
+</body>
+</html>
