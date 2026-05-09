@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+    <style>
+        :root { --neon: #66fcf1; --mars: #ff4d00; --bg: #0b0c10; --box: #c5a059; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 15px; display: flex; flex-direction: column; height: 95vh; overflow: hidden; }
+        
+        #warehouse { 
+            background: #151515; border: 2px solid #333; border-radius: 10px; padding: 10px; 
+            margin-bottom: 15px; display: flex; gap: 20px; align-items: flex-end; min-height: 100px;
+        }
+        .cargo-box { display: flex; flex-direction: column; align-items: center; min-width: 80px; }
+        .box-body { width: 70px; height: 50px; background: var(--box); border: 2px solid #8e6d2d; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #3e2723; font-weight: bold; font-size: 18px; }
+        .box-label { background: #eee; color: #000; padding: 2px 5px; font-size: 11px; margin-top: 4px; border-radius: 3px; font-weight: bold; }
+
+        #main { display: flex; gap: 15px; flex-grow: 1; min-height: 0; }
+        #editor-side, #canvas-side { flex: 1; display: flex; flex-direction: column; }
+        textarea { background: #000; color: var(--neon); border: 1px solid #444; padding: 15px; font-size: 15px; flex-grow: 1; resize: none; outline: none; border-radius: 5px; line-height: 1.5; }
+        #mycanvas { background: #1a0f0a; border: 2px solid #333; border-radius: 10px; flex-grow: 1; }
+        .run-btn { background: var(--mars); color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="warehouse"><span style="color:#444">Склад готов к вычислениям...</span></div>
+
+    <div id="main">
+        <div id="editor-side">
+            <textarea id="yourcode" spellcheck="false" oninput="updateWarehouse()">import turtle
+rover = turtle.Turtle()
+rover.color("#66fcf1")
+rover.pensize(3)
+
+# 1. Создай две коробки: a = 50 и b = 100
+
+# 2. Создай третью коробку 'result', которая равна a + b
+
+# 3. Прикажи роверу проехать вперед на 'result' шагов
+</textarea>
+            <button class="run-btn" onclick="runit()">ЗАПУСТИТЬ СИНТЕЗ ▶️</button>
+        </div>
+        <div id="canvas-side">
+            <div id="mycanvas"></div>
+        </div>
+    </div>
+
+<script>
+    function updateWarehouse() {
+        const code = document.getElementById("yourcode").value;
+        const warehouse = document.getElementById("warehouse");
+        
+        // Магия Skulpt для безопасного вычисления значений в реальном времени
+        const lines = code.split('\n');
+        const vars = {};
+        
+        lines.forEach(line => {
+            const match = line.match(/([a-zA-Z_]\w*)\s*=\s*(.+)/);
+            if (match) {
+                const name = match[1];
+                const expr = match[2].trim();
+                try {
+                    // Простая попытка вычислить выражение (только цифры и переменные)
+                    let cleanExpr = expr.replace(/[a-zA-Z_]\w*/g, (m) => vars[m] || m);
+                    if (/^[0-9+\-*/().\s]+$/.test(cleanExpr)) {
+                        vars[name] = eval(cleanExpr);
+                    }
+                } catch(e) {}
+            }
+        });
+
+        let html = '';
+        for (let n in vars) {
+            if (n === 'i') continue;
+            html += `<div class="cargo-box"><div class="box-body">${vars[n]}</div><div class="box-label">${n}</div></div>`;
+        }
+        warehouse.innerHTML = html || '<span style="color:#444">Ожидание формул (напр. total = a + b)...</span>';
+    }
+
+    function runit() {
+        const prog = document.getElementById("yourcode").value;
+        document.getElementById("mycanvas").innerHTML = '';
+        Sk.configure({read: (x) => Sk.builtinFiles["files"][x]});
+        (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
+        Sk.misceval.asyncToPromise(() => Sk.importMainWithBody("<stdin>", false, prog, true));
+    }
+</script>
+</body>
+</html>
