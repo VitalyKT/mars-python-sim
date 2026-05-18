@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+    <style>
+        :root { --neon: #66fcf1; --mars: #ff4d00; --bg: #0b0c10; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 15px; display: flex; flex-direction: column; height: 95vh; overflow: hidden; }
+        .mission-box { background: rgba(102, 252, 241, 0.05); padding: 12px; border-radius: 8px; border-left: 4px solid var(--neon); margin-bottom: 15px; font-size: 14px; }
+        #lab { display: flex; gap: 15px; flex-grow: 1; min-height: 0; }
+        #editor-side, #canvas-side { flex: 1; display: flex; flex-direction: column; }
+        textarea { background: #000; color: var(--neon); border: 1px solid #444; padding: 15px; font-size: 15px; flex-grow: 1; resize: none; outline: none; border-radius: 5px; line-height: 1.6; }
+        #mycanvas { background: #1a0f0a; border: 2px solid #333; border-radius: 10px; flex-grow: 1; }
+        .run-btn { background: var(--mars); color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 5px; text-transform: uppercase; margin-top: 10px; }
+        #ai-status { font-size: 14px; color: #888; margin-top: 5px; text-align: center; height: 20px; }
+    </style>
+</head>
+<body>
+
+    <h2 style="color: var(--neon); text-align: center; margin: 0 0 10px 0;">🤖 ПРОТОКОЛ «Б»: АЛЬТЕРНАТИВНЫЙ ВЫБОР</h2>
+
+    <div class="mission-box">
+        <strong>ЗАДАЧА:</strong> На Марсе объявлена буря (<code>storm_alert = True</code>). <br>
+        Допиши блок <b>else:</b> так, чтобы в случае опасности ровер не ехал вперед, а активировал аварийный протокол — нарисовал защитный круг командой <b>rover.circle(40)</b>.
+    </div>
+
+    <div id="lab">
+        <div id="editor-side">
+            <textarea id="yourcode" spellcheck="false">import turtle
+rover = turtle.Turtle()
+rover.color("#66fcf1")
+rover.pensize(4)
+rover.speed(4)
+
+# Бортовой датчик погоды (True - буря, False - ясно)
+storm_alert = True 
+
+if storm_alert == False:
+    # План А: Едем исследовать каньон
+    rover.forward(150)
+else:
+    # === НАПИШИ ПЛАН Б НИЖЕ ===
+    # Нарисуй круг радиусом 40, если буря активна!
+    
+</textarea>
+            <button class="run-btn" onclick="runit()">ТЕСТ СИСТЕМЫ ИИ ▶️</button>
+        </div>
+        <div id="canvas-side">
+            <div id="mycanvas"></div>
+            <div id="ai-status">ИИ: Сканирование атмосферного давления...</div>
+        </div>
+    </div>
+
+<script>
+    function outf(text) { console.log(text); }
+    function builtinRead(x) { return Sk.builtinFiles["files"][x]; }
+    
+    function runit() {
+        const prog = document.getElementById("yourcode").value;
+        const status = document.getElementById("ai-status");
+        document.getElementById("mycanvas").innerHTML = '';
+        status.innerText = "⚙️ АНАЛИЗ ВАРИАНТОВ РАЗВИТИЯ СОБЫТИЙ...";
+        status.style.color = "#888";
+
+        Sk.configure({output:outf, read:builtinRead});
+        (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
+        
+        Sk.misceval.asyncToPromise(() => {
+            return Sk.importMainWithBody("<stdin>", false, prog, true);
+        }).then(() => {
+            const hasElse = prog.includes('else:');
+            const hasCircle = prog.includes('circle');
+            
+            if (hasElse && hasCircle) {
+                status.innerText = "✅ ОТЛИЧНО! Ровер распознал бурю и ушел в защиту по плану Б.";
+                status.style.color = "#2ecc71";
+            } else {
+                status.innerText = "⚠️ Ровер проигнорировал бурю! Добавь блок else: и команду circle.";
+                status.style.color = "#f1fa8c";
+            }
+        }).catch(err => {
+            status.innerText = "❌ ОШИБКА СИНТАКСИСА ИИ: " + err.toString();
+            status.style.color = "#ff4d00";
+        });
+    }
+</script>
+</body>
+</html>
