@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+    <style>
+        :root { --neon: #66fcf1; --mars: #ff4d00; --bg: #0b0c10; --box: #c5a059; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 10px; display: flex; flex-direction: column; height: 98vh; overflow: hidden; }
+        
+        #warehouse { 
+            background: #151515; border: 2px solid #333; border-radius: 10px; padding: 10px; 
+            margin-bottom: 10px; display: flex; gap: 20px; align-items: center; min-height: 80px;
+        }
+        .cargo-box { display: flex; flex-direction: column; align-items: center; min-width: 70px; }
+        .box-body { width: 60px; height: 40px; background: var(--box); border: 2px solid #8e6d2d; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #3e2723; font-weight: bold; font-size: 16px; }
+        .box-label { background: #eee; color: #000; padding: 1px 4px; font-size: 10px; margin-top: 2px; border-radius: 3px; font-weight: bold; }
+
+        #main { display: flex; gap: 10px; flex-grow: 1; min-height: 0; }
+        #editor-side, #canvas-side { flex: 1; display: flex; flex-direction: column; }
+        textarea { background: #000; color: var(--neon); border: 1px solid #444; padding: 15px; font-size: 14px; flex-grow: 1; resize: none; outline: none; border-radius: 5px; line-height: 1.5; }
+        #mycanvas { background: #1a0f0a; border: 2px solid #333; border-radius: 10px; flex-grow: 1; }
+        .run-btn { background: var(--mars); color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="warehouse"><span style="color:#444">Мониторинг тормозных систем...</span></div>
+
+    <div id="main">
+        <div id="editor-side">
+            <textarea id="yourcode" spellcheck="false">import turtle
+rover = turtle.Turtle()
+rover.color("#ff4d00") # Сделаем марсианский оранжевый след
+rover.speed(0)
+
+# 1. Стартуем с большого размера
+size = 200
+
+# 2. Цикл закручивания воронки
+for i in range(35):
+    rover.forward(size)
+    rover.left(90)
+    
+    # 3. НАПИШИ КОМАНДУ УМЕНЬШЕНИЯ ТУТ:
+    # Забирай у переменной 'size' по 6 единиц на каждом шаге
+    
+</textarea>
+            <button class="run-btn" onclick="runit()">ВКЛЮЧИТЬ ТОРМОЖЕНИЕ ▶️</button>
+        </div>
+        <div id="canvas-side">
+            <div id="mycanvas"></div>
+        </div>
+    </div>
+
+<script>
+    function updateBox(name, val) {
+        const warehouse = document.getElementById("warehouse");
+        let box = document.getElementById("box-" + name);
+        if (!box) {
+            const div = document.createElement("div");
+            div.className = "cargo-box";
+            div.id = "box-" + name;
+            div.innerHTML = `<div class="box-body" id="val-${name}">0</div><div class="box-label">${name}</div>`;
+            warehouse.appendChild(div);
+            box = div;
+        }
+        document.getElementById("val-" + name).innerText = Math.round(val);
+    }
+
+    function runit() {
+        const prog = document.getElementById("yourcode").value;
+        document.getElementById("mycanvas").innerHTML = '';
+        document.getElementById("warehouse").innerHTML = '';
+        
+        Sk.configure({
+            read: (x) => Sk.builtinFiles["files"][x],
+            yieldLimit: 100
+        });
+        
+        (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
+        
+        Sk.misceval.asyncToPromise(() => {
+            return Sk.importMainWithBody("<stdin>", false, prog, true);
+        });
+
+        const timer = setInterval(() => {
+            if (Sk.main_module && Sk.main_module.$d) {
+                for (let key in Sk.main_module.$d) {
+                    let val = Sk.main_module.$d[key];
+                    if (val && val.v !== undefined && key !== 'i' && key !== 'turtle' && key !== 'rover') {
+                        updateBox(key, val.v);
+                    }
+                }
+            }
+        }, 100);
+    }
+</script>
+</body>
+</html>
