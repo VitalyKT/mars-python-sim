@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+    <style>
+        :root { --neon: #66fcf1; --mars: #ff4d00; --bg: #0b0c10; --danger: #ff3333; }
+        body { background: var(--bg); color: #fff; font-family: 'Courier New', monospace; margin: 0; padding: 15px; display: flex; flex-direction: column; height: 95vh; overflow: hidden; }
+        .mission-box { background: rgba(255, 77, 0, 0.05); padding: 12px; border-radius: 8px; border-left: 4px solid var(--mars); margin-bottom: 15px; font-size: 14px; }
+        #lab { display: flex; gap: 15px; flex-grow: 1; min-height: 0; }
+        #editor-side, #canvas-side { flex: 1; display: flex; flex-direction: column; }
+        textarea { background: #000; color: var(--neon); border: 1px solid #444; padding: 15px; font-size: 15px; flex-grow: 1; resize: none; outline: none; border-radius: 5px; line-height: 1.6; }
+        #mycanvas { background: #1a0f0a; border: 2px solid #333; border-radius: 10px; flex-grow: 1; position: relative; }
+        
+        /* Визуальная опасная зона на карте */
+        #danger-zone { position: absolute; right: 0; top: 0; width: 40%; height: 100%; background: rgba(255, 51, 51, 0.05); border-left: 2px dashed var(--danger); display: flex; align-items: center; justify-content: center; color: var(--danger); font-size: 12px; font-weight: bold; pointer-events: none; }
+
+        .run-btn { background: var(--mars); color: #fff; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 5px; text-transform: uppercase; margin-top: 10px; }
+        #ai-status { font-size: 14px; color: #888; margin-top: 5px; text-align: center; height: 20px; }
+    </style>
+</head>
+<body>
+
+    <h2 style="color: var(--neon); text-align: center; margin: 0 0 10px 0;">🤖 МОДУЛЬ ИИ: ДАТЧИК ПЕРИМЕТРА</h2>
+
+    <div class="mission-box">
+        <strong>ЗАДАНИЕ:</strong> Ровер отправляется в разведку на 150 шагов вперед. <br>
+        Напиши условие <b>if</b>: ЕСЛИ координата ровера <b>rover.xcor()</b> станет больше 80, то включи тревогу — измени цвет ровера на <b>"red"</b> и сделай толщину линии <b>8</b>.
+    </div>
+
+    <div id="lab">
+        <div id="editor-side">
+            <textarea id="yourcode" spellcheck="false">import turtle
+rover = turtle.Turtle()
+rover.color("#66fcf1") # Безопасный неоновый цвет
+rover.pensize(3)
+rover.speed(3)
+
+# Ровер едет в сторону опасной зоны
+rover.forward(150)
+
+# === НАПИШИ РАБОТУ ИИ НИЖЕ ===
+# Подсказка: if rover.xcor() > 80:
+# Не забудь про отступы в 4 пробела для команд внутри if!
+
+</textarea>
+            <button class="run-btn" onclick="runit()">ВКЛЮЧИТЬ БОРТОВОЙ ИИ ▶️</button>
+        </div>
+        <div id="canvas-side" style="position: relative; display: flex; flex-direction: column;">
+            <div id="mycanvas">
+                <div id="danger-zone">⚠️ РАДИАЦИЯ (X > 80)</div>
+            </div>
+            <div id="ai-status">ИИ: Ожидание сканирования местности...</div>
+        </div>
+    </div>
+
+<script>
+    function outf(text) { console.log(text); }
+    function builtinRead(x) { return Sk.builtinFiles["files"][x]; }
+    
+    function runit() {
+        const prog = document.getElementById("yourcode").value;
+        const status = document.getElementById("ai-status");
+        document.getElementById("mycanvas").innerHTML = '<div id="danger-zone">⚠️ РАДИАЦИЯ (X > 80)</div>';
+        status.innerText = "🤖 БОРТОВОЙ КОМПЬЮТЕР АНАЛИЗИРУЕТ ДАННЫЕ...";
+        status.style.color = "#888";
+
+        Sk.configure({output:outf, read:builtinRead});
+        (Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = 'mycanvas';
+        
+        Sk.misceval.asyncToPromise(() => {
+            return Sk.importMainWithBody("<stdin>", false, prog, true);
+        }).then(() => {
+            const hasIf = prog.includes('if ') && prog.includes('>');
+            const hasRed = prog.includes('red');
+            
+            if (hasIf && hasRed) {
+                status.innerText = "✅ ИИ СРАБОТАЛ! Ровер вовремя обнаружил радиацию и сменил протокол.";
+                status.style.color = "#2ecc71";
+            } else if (hasIf && !hasRed) {
+                status.innerText = "⚠️ Условие написано, но ровер не изменил цвет на 'red'.";
+                status.style.color = "#f1fa8c";
+            } else {
+                status.innerText = "⚠️ Ровер заехал в опасную зону, но ИИ промолчал. Используй команду if!";
+                status.style.color = "#f1fa8c";
+            }
+        }).catch(err => {
+            status.innerText = "❌ СБОЙ СИСТЕМЫ ИИ: " + err.toString();
+            status.style.color = "#ff4d00";
+        });
+    }
+</script>
+</body>
+</html>
